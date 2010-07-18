@@ -1,0 +1,1844 @@
+/*  parser.y -- XKB parser.
+
+    Copyright (C) 2003  Marco Gerards
+   
+    Written by Marco Gerards <marco@student.han.nl>
+    
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.  */
+
+%{
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
+#include "xkb.h"
+
+  /* th,us_intl,tr werk nie */
+
+static void yyerror(char *);
+int yylex (void);
+static error_t addkeyname (char *keyname, int keycode);
+static int find_keyname (char *keyname);
+static error_t keytype_new (char *name, struct keytype **new_kt);
+static int get_vmod (char *vmodname); 
+static error_t add_vmod (char *vmodname);
+static error_t keytype_mapadd (struct keytype *kt, modmap_t mods, int level);
+static error_t preserve_add (struct keytype *kt, modmap_t mods,
+			     modmap_t preserve);
+static error_t new_interp (xkm_interpret_t **new_interpret, symbol);
+static error_t include_section (char *incl, int sectionsymbol, char *dirname,
+				mergemode);
+static error_t include_sections (char *incl, int sectionsymbol, char *dirname,
+				 mergemode);
+void close_include ();
+static void skipsection (void);
+static error_t set_default_action (struct xkb_action *, struct xkb_action **);
+static void key_set_keysym (struct key *key, group group, int level, symbol ks);
+static void key_new (char *keyname);
+static void key_delete (char *keyname);
+void scanner_unput (int c);
+static void set_rmod_keycode (char *key);
+static error_t add_rmod_keysym (symbol ks);
+static void remove_symbols (struct key *key, group group);
+
+struct xkm_interpret *last_interp;
+struct xkm_interpret *current_interpretation;
+struct xkm_interpret default_interpretation;
+struct xkb_action *current_action;
+
+struct xkb_action default_setmods = { SA_SetMods };
+struct xkb_action default_lockmods = { SA_LockMods };
+struct xkb_action default_latchmods = { SA_LatchMods };
+struct xkb_action default_setgroup = { SA_SetGroup };
+struct xkb_action default_latchgroup = { SA_LatchGroup };
+struct xkb_action default_lockgroup = { SA_LockGroup };
+struct xkb_action default_moveptr = { SA_MovePtr };
+struct xkb_action default_ptrbtn = { SA_PtrBtn };
+struct xkb_action default_lockptrbtn = { SA_LockPtrBtn };
+struct xkb_action default_ptrdflt = { SA_SetPtrDflt };
+struct xkb_action default_setcontrols = { SA_SetControls };
+struct xkb_action default_lockcontrols = { SA_LockControls };
+struct xkb_action default_isolock = { SA_ISOLock };
+struct xkb_action default_switchscrn = { SA_SwitchScreen };
+struct xkb_action default_consscroll = { SA_ConsScroll };
+
+
+/* The dummy gets used when the original may not be overwritten.  */
+static struct key dummy_key;
+static struct key *current_key;
+static struct keytype dummy_keytype;
+
+/* The current parsed group.  */
+static int current_group;
+static int current_rmod = 0;
+
+/* The current symbol in the currently parsed key.  */
+static int symbolcnt;
+
+/* Maximum of 32 shiftlevels for actions.  */
+static xkb_action_t keyactions[32];
+static int actioncnt;
+
+mergemode merge_mode = override;
+
+//#define	YYDEBUG	1
+
+static struct keytype *current_keytype;
+%}
+
+%union {
+  int val;
+  char *str;
+  modmap_t modmap;
+  struct xkb_action *action;
+  double dbl;
+  mergemode mergemode;
+}
+
+%token XKBKEYMAP	"xkb_keymap"
+%token XKBKEYCODES	"xkb_keycodes"
+%token XKBCOMPAT	"xkb_compatibility"
+%token XKBGEOMETRY	"xkb_geometry"
+%token XKBTYPES		"xkb_types"
+%token XKBSYMBOLS	"xkb_symbols"
+%token STR
+%token FLAGS
+%token KEYCODE
+%token NUM
+%token MINIMUM		"minimum"
+%token MAXIMUM		"maximum"
+%token VIRTUAL		"virtual"
+%token INDICATOR	"indicator"
+%token ALIAS		"alias"
+%token IDENTIFIER
+%token VMODS		"virtualmods"
+%token TYPE		"type"
+%token MAP		"map"
+%token LEVEL_NAME	"level_name"
+%token PRESERVE		"preserve"
+%token LEVEL
+%token USEMODMAP	"usemodmap"
+%token REPEAT		"repeat"
+%token LOCKING		"locking"
+%token VIRTUALMODIFIER	"virtualmod"
+%token BOOLEAN
+%token INTERPRET	"interpret"
+%token INTERPMATCH
+%token CLEARLOCKS	"clearlocks"
+%token MODS		"mods"
+%token SETMODS		"setmods"
+%token LATCHMODS	"latchmods"
+%token LOCKMODS		"lockmods"
+%token ACTION		"action"
+%token LATCHTOLOCK	"latchtolock"
+%token GROUP		"group"
+%token GROUPS		"groups"
+%token SETGROUP		"setgroup"
+%token LATCHGROUP	"latchgroup"
+%token LOCKGROUP	"lockgroup"
+%token ACCEL		"accel"
+%token MOVEPTR		"moveptr"
+%token BUTTON		"button"
+%token BUTTONNUM
+%token DEFAULT		"default"
+%token COUNT		"count"
+%token PTRBTN		"ptrbtn"
+%token DEFAULTBTN	"defaultbutton"
+%token ALL		"all"
+%token NONE		"none"
+%token ANY		"any"
+%token CONTROLFLAG
+%token AFFECT		"affect"
+%token PTRDFLT		"setptrdflt"
+%token LOCKPTRBTN	"lockptrbtn"
+%token SETCONTROLS	"setcontrols"
+%token LOCKCONTROLS	"lockcontrols"
+%token CONTROLS		"controls"
+%token TERMINATE	"terminate"
+%token WHICHMODSTATE	"whichmodstate"
+%token WHICHGROUPSTATE	"whichgroupstate"
+%token WHICHSTATE	"whichstate"
+%token INDEX		"index"
+%token ALLOWEXPLICIT	"allowexplicit"
+%token DRIVESKBD	"driveskbd"
+//%token AFFECTBTNLOCK
+%token SYMBOLS		"symbols"
+%token NAME		"name"
+%token GROUPNUM
+%token ACTIONS		"actions"
+%token KEY		"key"
+%token MODMAP		"modifier_map"
+%token SHIFT		"shift"
+%token LOCK		"lock"
+%token CONTROL		"control"
+%token MOD1		"mod1"
+%token MOD2		"mod2"
+%token MOD3		"mod3"
+%token MOD4		"mod4"
+%token MOD5		"mod5"
+%token UNLOCK		"unlock"
+%token BOTH		"both"
+%token NEITHER		"neither"
+%token INCLUDE		"include"
+%token ISOLOCK		"isolock"
+%token POINTERS		"pointers"
+%token NOACTION		"noaction"
+%token REPLACE		"replace"
+%token GROUPSWRAP	"groupswrap"
+%token GROUPSCLAMP	"groupsclamp"
+%token GROUPSREDIRECT	"groupsredirect"
+%token OVERLAY		"overlay"
+%token SWITCHSCREEN	"switchscreen"
+%token SAMESERVER	"sameserver"
+%token SCREEN		"screen"
+%token LINE		"line"
+%token PERCENT		"percent"
+%token CONSSCROLL	"consscroll"
+%token FLOAT		"float"
+%type <str> STR KEYCODE IDENTIFIER
+%type <val> FLAGS NUM vmod level LEVEL rmod BOOLEAN symbol INTERPMATCH
+%type <val> clearlocks usemodmap latchtolock noaccel button BUTTONNUM
+%type <val> ctrlflags allowexplicit driveskbd
+%type <val> DRIVESKBD GROUPNUM group symbolname
+/* Booleans */
+%type <val> locking repeat groupswrap groupsclamp sameserver
+%type <modmap> mods
+%type <action> action
+%type <action> ctrlparams
+%type <mergemode> INCLUDE
+%type <dbl> FLOAT
+//%debug
+//%expect 72
+
+%%
+/* A XKB keymap.  */
+xkbkeymap:
+  "xkb_keymap" '{' keymap '}' ';' { YYACCEPT }  
+| "xkb_keymap" string '{' keymap '}' ';' { YYACCEPT }
+| '{' keymap '}' { YYACCEPT } ';'
+;
+
+/* Dummy string, it should only be recognised, immidiatly free memory.
+   */
+string:
+  STR { free ($1) }
+;
+
+/* A XKB configuration has many sections. */
+keymap:
+	/* empty */
+| keymap types
+| keymap keycodes
+| keymap compat
+| keymap symbols
+| keymap geometry
+;
+
+/* All flags assigned to a section.  */
+flags:
+  /* empty */
+| flags FLAGS
+;
+
+/* The header of a keycode section.  */
+keycodes: 
+  "xkb_keycodes" '{' keycodesect  '}' ';'
+| "xkb_keycodes" string '{' keycodesect  '}' ';'
+| flags "xkb_keycodes" '{' keycodesect '}' ';'
+| flags "xkb_keycodes" string '{' keycodesect '}' ';'
+;
+
+/* Process the includes on the stack.  */
+keycodesinclude:
+  '{' keycodesect '}'			 { close_include () }
+| keycodesinclude '{' keycodesect '}'	 { close_include () }
+;
+
+
+/* The first lines of a keycode section. The amount of keycodes are
+   declared here.  */
+keycodesect:
+/* empty */
+| "minimum" '=' NUM ';' keycodesect
+   { 
+     min_keys = $3;
+     current_key = &keys[$3];
+   }
+| MAXIMUM '=' NUM ';' keycodesect 
+   { 
+     max_keys = $3;
+     keys = calloc ($3, sizeof (struct key));
+   }
+| KEYCODE '=' NUM ';'
+   { addkeyname ($1, $3); }
+  keycodesect	
+| "replace" KEYCODE '=' NUM ';'
+   { addkeyname ($2, $4); }
+  keycodesect
+| "indicator" NUM '=' string ';' keycodesect {  }
+| "virtual" INDICATOR NUM '=' string ';' keycodesect
+| "alias" KEYCODE '=' KEYCODE ';'
+   { addkeyname ($2, find_keyname ($4)); }
+  keycodesect
+| INCLUDE STR 
+   { include_sections ($2, XKBKEYCODES, "keycodes", $1); }
+  keycodesinclude keycodesect
+;
+
+/* The header of a keytypes section.  */
+types:
+  "xkb_types" '{' typessect  '}' ';'
+| "xkb_types" string '{' typessect  '}' ';'
+| flags "xkb_types" '{' typessect '}' ';'
+| flags "xkb_types" string '{' typessect '}' ';'
+;
+
+/* A list of virtual modifier declarations (see vmods_def), seperated 
+   by commas.  */
+vmodslist:
+  IDENTIFIER { add_vmod ($1); }
+| vmodslist ',' IDENTIFIER { add_vmod ($3) }
+;
+
+/* Virtual modifiers must be declared before they can be used.  */
+vmods_def:
+  "virtualmods" vmodslist ';'
+;
+
+/* Return the number of the virtual modifier.  */
+vmod:
+	IDENTIFIER		{ $$ = get_vmod ($1); free ($1) }
+;
+
+/* A single realmodifier.  */
+rmod:
+  "shift" 	{ $$ = 1 }
+| "lock" 	{ $$ = 2 }
+| "control"	{ $$ = 4 }
+| "mod1"	{ $$ = 8 }
+| "mod2"	{ $$ = 16 }
+| "mod3"	{ $$ = 32 }
+| "mod4"	{ $$ = 64 }
+| "mod5"	{ $$ = 128 }
+;
+
+/* One of more modifiers, seperated by '+'. A modmap_t will return all real
+   and virtual modifiers specified.  */
+mods:
+  mods '+' rmod { $$.rmods = $1.rmods | $3; }
+| mods '+' vmod { $$.vmods = $1.vmods | $3; }
+	/* Use a mid-rule action to start with no modifiers.  */
+| { $$.rmods = 0; $$.vmods = 0 } rmod		{ $$.rmods = $2; }
+| { $$.rmods = 0; $$.vmods = 0 } vmod 		{ $$.vmods = $2; }
+| "all"	{ $$.rmods = 0xFF; $$.vmods = 0xFFFF}
+| "none"  { $$.rmods = 0; $$.vmods = 0 }
+;
+
+/* The numeric level starts with 0. Level1-Level4 returns 0-3, also
+   numeric values can be used to describe a level.  */
+level:
+  LEVEL	{ $$ = $1 - 1 }
+| "any" { $$ = 0      }
+| NUM	{ $$ = $1 - 1 }
+;
+
+/* A single keytype.  */
+type:
+	/* Empty */
+| type MODS '=' mods ';'
+   { current_keytype->modmask = $4 }
+| type MAP '[' mods ']' '=' level ';' 	     
+   { keytype_mapadd (current_keytype, $4, $7) }
+| type "level_name" '[' level ']' '=' string ';'
+| type "preserve" '[' mods ']' '=' mods ';'    
+   { preserve_add (current_keytype, $4, $7) }
+;
+
+/* Process the includes on the stack.  */
+typesinclude:
+  '{' typessect '}'			 { close_include () }
+| typesinclude '{' typessect '}'	 { close_include () }
+;
+
+/* A keytype section contains keytypes and virtual modifier declarations.  */
+typessect:
+	/* Empty */
+| typessect vmods_def
+| typessect TYPE STR { keytype_new ($3, &current_keytype) }'{' type '}' ';' { }
+| typessect INCLUDE STR 
+   { include_sections ($3, XKBTYPES, "types", $2) }
+  typesinclude
+;
+
+/* The header of a compatibility section.  */
+compat:
+  "xkb_compatibility" '{' compatsect  '}' ';'
+| "xkb_compatibility" string '{' compatsect  '}' ';'
+| flags "xkb_compatibility" '{' compatsect '}' ';'
+| flags "xkb_compatibility" string '{' compatsect '}' ';'
+;
+
+/* XXX: A symbol can be more than just an identifier (hex).  */
+symbol:
+  IDENTIFIER		{ $$ = XStringToKeysym ($1); /*free ($1)*/} 
+/* XXX: free is fucked here, Why?*/
+| ANY 			{ $$ = 0  }
+;
+
+/* Which kinds of modifiers (like base, locked, etc.) can affect the
+   indicator.  */
+whichstate:
+  WHICHSTATE
+| "none"
+| "any"
+;  
+
+/* The groups that can affect a indicator.  */
+groups:
+  groups '+' group
+| groups '-' group
+| group {}
+| "all"
+;
+
+indicators:
+/* empty */
+| indicator
+| indicators indicator
+;
+
+/* An indicator desciption.  */
+indicator:
+  "mods" '=' mods ';'
+| "groups" '=' groups ';'
+| "controls" '=' ctrls ';'
+| "whichmodstate" '=' whichstate ';'
+| "whichgroupstate" '=' whichstate ';'
+| allowexplicit ';' {}
+| driveskbd ';' {}
+| "index" '=' NUM ';' {}
+;
+
+/* Boolean for allowexplicit.  */
+allowexplicit:
+  '~' "allowexplicit"		 { $$ = 0 }
+| '!' "allowexplicit"		 { $$ = 0 }
+| "allowexplicit"			 { $$ = 1 }
+| "allowexplicit" '=' BOOLEAN	 { $$ = $3 }
+;
+
+/* Boolean for driveskbd.  */
+driveskbd:
+  '~' "driveskbd"		 { $$ = 0 }
+| '!' "driveskbd"		 { $$ = 0 }
+| "driveskbd"			 { $$ = 1 }
+| "driveskbd" '=' BOOLEAN	 { $$ = $3 }
+;
+
+interprets:
+  /* Empty */
+| interpret
+| interprets interpret
+;
+
+/* A single interpretation.  */
+interpret:
+  "usemodmap" '=' level ';'
+	{ current_interpretation->match &= 0x7F | ($3 << 7) } /* XXX */
+| repeat ';'
+  {
+    current_interpretation->flags &= ~(KEYREPEAT | KEYNOREPEAT);
+    current_interpretation->flags |= $1;
+  }
+| locking ';' {}
+| "virtualmod" '=' vmod ';' 	{ current_interpretation->vmod = $3 }
+| "action" '=' action ';' 	
+   { 
+     memcpy (&current_interpretation->action, $3, sizeof (xkb_action_t));
+     free ($3);
+   }
+;
+
+/* Process the includes on the stack.  */
+compatinclude:
+  '{' compatsect '}'			 { close_include () }
+| compatinclude '{' compatsect '}'	 { close_include () }
+;
+
+/* The body of a compatibility section.  */
+compatsect:
+	/* Empty */
+| compatsect vmods_def
+| compatsect "interpret" '.' 
+   { current_interpretation = &default_interpretation }
+  interpret
+| compatsect "interpret" symbol 
+	{ 
+	  new_interp (&current_interpretation, $3);
+	  current_interpretation->match |= 1;
+	}
+  '{' interprets '}' ';'
+| compatsect "interpret" symbol '+' rmod
+	{
+	  new_interp (&current_interpretation, $3);
+	  current_interpretation->rmods = $5;
+	  current_interpretation->match |= 4;
+	}
+  '{' interprets '}' ';'
+| compatsect "interpret" symbol '+' "any"
+	{
+	  new_interp (&current_interpretation, $3);
+	  current_interpretation->rmods = 255;
+	  current_interpretation->match |= 2;
+	}
+  '{' interprets '}' ';'
+| compatsect "interpret" symbol '+' INTERPMATCH '(' mods ')'
+        {
+	  new_interp (&current_interpretation, $3);
+	  current_interpretation->rmods = $7.rmods;
+	  current_interpretation->match |= $5;
+	}
+  '{' interprets '}' ';'
+| compatsect GROUP NUM '=' mods ';'
+| compatsect "indicator" string '{' indicators '}' ';'
+| compatsect INCLUDE STR
+   { include_sections ($3, XKBCOMPAT, "compat", $2) }
+  compatinclude
+| compatsect actiondef
+| compatsect "indicator" '.' indicator
+;
+
+
+	/* Booleans  */
+/* Boolean for clearlocks.  */
+clearlocks:
+  '~' "clearlocks"		 { $$ = 0 }
+| '!' "clearlocks"		 { $$ = 0 }
+| "clearlocks"			 { $$ = 1 }
+| "clearlocks" '=' BOOLEAN	 { $$ = $3 }
+;
+
+/* Boolean for latchtolock.  */
+latchtolock:
+  '~' "latchtolock"		 { $$ = 0 }
+| '!' "latchtolock"		 { $$ = 0 }
+| "latchtolock"			 { $$ = 1 }
+| "latchtolock" '=' BOOLEAN	 { $$ = $3 }
+;
+
+/* Boolean for useModMap.  */
+usemodmap:
+  '~' "usemodmap"	 	 { $$ = 0 }
+| '!' "usemodmap"		 { $$ = 0 }
+| "usemodmap"			 { $$ = 1 }
+| "usemodmap" '=' BOOLEAN 	 { $$ = $3 }
+;
+
+/* Boolean for locking.  */
+locking:
+  '~' "locking"		 { $$ = 0 }
+| '!' "locking"		 { $$ = 0 }
+| "locking"			 { $$ = 1 }
+| "locking" '=' BOOLEAN	 { $$ = $3 }
+;
+
+/* Boolean for repeat.  */
+repeat:
+  '~' "repeat"		 { $$ = KEYNOREPEAT }
+| '!' "repeat"		 { $$ = KEYNOREPEAT }
+| "repeat"		 { $$ = KEYREPEAT }
+| "repeat" '=' BOOLEAN	 
+  {
+    if ($3)
+      $$ = KEYREPEAT;
+    else
+      $$ = KEYNOREPEAT;
+  }
+;
+
+/* Boolean for groupswrap.  */
+groupswrap:
+  '~' "groupswrap"		 { $$ = 0 }
+| '!' "groupswrap"		 { $$ = 0 }
+| "groupswrap"			 { $$ = 1 }
+| "groupswrap" '=' BOOLEAN	 { $$ = $3 }
+;
+
+/* Boolean for groupsclamp.  */
+groupsclamp:
+  '~' "groupsclamp"		 { $$ = 0 }
+| '!' "groupsclamp"		 { $$ = 0 }
+| "groupsclamp"			 { $$ = 1 }
+| "groupsclamp" '=' BOOLEAN	 { $$ = $3 }
+;
+
+/* Boolean for noaccel.  */
+noaccel:
+  '~' "accel"		 { $$ = 0 }
+| '!' "accel"		 { $$ = 0 }
+| "accel"		 { $$ = 1 }
+| "accel" '=' BOOLEAN	 { $$ = $3 }
+;
+
+
+sameserver:
+  '~' "sameserver"	 { $$ = 0 }
+| '!' "sameserver"	 { $$ = 0 }
+| "sameserver"		 { $$ = 1 }
+| "sameserver" '=' BOOLEAN { $$ = $3 }
+;
+
+setmodsparams:
+ /* empty */
+| setmodsparam
+| setmodsparams ',' setmodsparam
+;
+
+/* Parameter for the (Set|Lock|Latch)Mods action.  */
+setmodsparam:
+  "mods" '=' mods		
+  { 
+    ((action_setmods_t *) current_action)->modmap = $3;
+  }    
+| "mods" '=' "usemodmap"
+  { ((action_setmods_t *) current_action)->flags |= useModMap }    
+| clearlocks
+  {
+    ((action_setmods_t *) current_action)->flags &= ~CLEARLOCKS;
+    ((action_setmods_t *) current_action)->flags |= $1;
+  }
+| usemodmap
+  { 
+    ((action_setmods_t *) current_action)->flags &= ~USEMODMAP;
+    ((action_setmods_t *) current_action)->flags |= $1;
+  }
+| latchtolock
+  { 
+    ((action_setmods_t *) current_action)->flags &= ~LATCHTOLOCK;
+    ((action_setmods_t *) current_action)->flags |= $1;
+  }
+;
+
+setgroupparams:
+/* empty */
+| setgroupparam
+| setgroupparams ',' setgroupparam
+;
+
+/* Parameter for the (Set|Lock|Latch)Group action.  */
+setgroupparam:
+  "group" '=' NUM
+   {
+     ((action_setgroup_t *) current_action)->group = $3;
+     ((action_setgroup_t *) current_action)->flags |= groupAbsolute;
+   }
+| "group" '=' '+' NUM
+   {
+     ((action_setgroup_t *) current_action)->group = $4;
+   }
+| "group" '=' '-' NUM
+   {
+     ((action_setgroup_t *) current_action)->group = -$4;
+   }
+| clearlocks
+   {
+     ((action_setgroup_t *) current_action)->flags |= $1;
+   }
+| latchtolock
+   {
+     ((action_setgroup_t *) current_action)->flags |= $1;
+   }
+;
+
+moveptrparams:
+/* empty */
+| moveptrparam
+| moveptrparams ',' moveptrparam
+;
+
+/* Parameters for the MovePtr action.  */
+moveptrparam:
+  IDENTIFIER '=' NUM
+   {
+     ((action_moveptr_t *) current_action)->x = $3;
+     ((action_setgroup_t *) current_action)->flags |= MoveAbsoluteX;
+     free ($1);
+   }
+| IDENTIFIER '=' '+' NUM
+   {
+     ((action_moveptr_t *) current_action)->x = $4;
+     free ($1);
+   }
+| IDENTIFIER '=' '-' NUM
+   {
+     ((action_moveptr_t *) current_action)->x = -$4;
+     free ($1);
+   }
+| noaccel
+   {
+     ((action_moveptr_t *) current_action)->flags |= NoAcceleration;
+   }
+;
+
+/* A mouse button.  */
+button:
+  NUM 					{ $$ = $1 }
+| BUTTONNUM				{ $$ = $1 }
+| "default"				{ $$ = 0  }
+;
+
+affectbtnlock:
+  "lock"
+| "unlock"  
+| "both"
+| "neither"
+;  
+
+ptrbtnparams:
+  /* empty */
+| ptrbtnparam
+| ptrbtnparams ',' ptrbtnparam
+;
+
+/* Parameters for the (Set|Lock|Latch)PtrBtn action.  */
+ptrbtnparam:
+  "button" '=' button
+   { ((action_ptrbtn_t *) current_action)->button = $3; }
+| "count" '=' NUM
+   { ((action_ptrbtn_t *) current_action)->count = $3;  }
+| "affect" '=' affectbtnlock
+   {
+     //     ((action_ptrbtn_t *) $$)->a = $3;
+   }
+;
+
+/* XXX: This should be extended.  */
+affectbtns:
+  "defaultbutton"
+| "button"
+| "all"
+;
+
+ptrdfltparams:
+/* empty */
+| ptrdfltparam
+| ptrdfltparams ',' ptrdfltparam
+;
+
+/* Parameters for the SetPtrDflt action.  */
+ptrdfltparam:
+  "button" '=' button { }
+| "button" '=' '+' button { }
+| "button" '=' '-' button { }
+| "affect" '=' affectbtns { }
+;
+
+/* A list of controlflags.  */
+ctrls:
+  ctrls '+' CONTROLFLAG// { $$ |= $3 }
+| CONTROLFLAG// 		{ $$ = $1  }
+;
+
+/* Modified controlflags.  */
+ctrlflags:
+  ctrls { /*$$ = $1*/ 	}
+| "all" 	{ $$ = 0xFFFF 	}
+| "none" 	{ $$ = 0 	}
+;
+
+/* The parameters of a (Set|Lock|Latch)Ctrls Action.  */
+ctrlparams:
+  "controls" '=' ctrlflags
+   { ((action_setcontrols_t *) $$)->controls = $3; }
+;
+
+isoaffect:
+  "mods"
+| "groups"
+| "controls"
+| "pointers"
+| "all"
+| "none"
+;
+
+isolockparams:
+/* empty */
+| isolockparam
+| isolockparams ',' isolockparam
+;
+
+/* Parameters for the ISOLock action.  */
+isolockparam:
+  "mods" '=' mods		
+| "mods" '=' USEMODMAP
+| "group" '=' group
+| "controls" '=' ctrlflags
+| "affect" '=' isoaffect
+;
+
+switchscrnparams:
+  switchscrnparam 
+  | switchscrnparams ',' switchscrnparam
+;
+
+/* Parameters for the SwitchScreen action.  */
+switchscrnparam:
+  "screen" '=' NUM
+   {
+     ((action_switchscrn_t *) current_action)->screen = $3;
+     ((action_switchscrn_t *) current_action)->flags |= screenAbs;
+   }
+| "screen" '+' '=' NUM
+   {
+     ((action_switchscrn_t *) current_action)->screen = $4;
+   }
+| "screen" '-' '=' NUM
+   {
+     ((action_switchscrn_t *) current_action)->screen = -$4;
+   }
+| sameserver
+   {
+     /* XXX: Implement this.  */
+     ((action_switchscrn_t *) current_action)->flags &= ~0;
+     ((action_switchscrn_t *) current_action)->flags |= $1;
+   }
+;  
+
+consscrollparams:
+   consscrollparam
+ | consscrollparams ',' consscrollparam
+;
+
+/* Parameters for the ConsScroll action.  */
+consscrollparam:
+  "screen" '+' '=' FLOAT
+   {
+     ((action_consscroll_t *) current_action)->screen = $4;
+   }
+| "screen" '-' '=' FLOAT
+   {
+     ((action_consscroll_t *) current_action)->screen = -$4;
+   }
+| "line" '=' NUM
+   {
+     ((action_consscroll_t *) current_action)->line = $3;
+     ((action_consscroll_t *) current_action)->flags |= lineAbs;
+   }
+| "line" '+' '=' NUM
+   {
+     ((action_consscroll_t *) current_action)->line = $4;
+   }
+| "line" '-' '=' NUM
+   {
+     ((action_consscroll_t *) current_action)->line = -$4;
+   }
+| "percent" '=' NUM
+   {
+     ((action_consscroll_t *) current_action)->percent = $3;
+     ((action_consscroll_t *) current_action)->flags |= usePercentage;     
+   }
+;
+
+/* An action definition.  */
+action:
+  "setmods" 
+   { 
+     if (set_default_action (&default_setmods, &current_action))
+       YYABORT;
+   }
+  '(' setmodsparams ')'		{ $$ = current_action }
+| "latchmods" 
+   { 
+     if (set_default_action (&default_latchmods, &current_action))
+       YYABORT;
+   }
+  '(' setmodsparams ')' 	{ $$ = current_action }
+| "lockmods"
+   {
+     if (set_default_action (&default_lockmods, &current_action))
+       YYABORT;
+   }
+  '(' setmodsparams ')' 	{ $$ = current_action }
+| "setgroup"
+   {
+     if (set_default_action (&default_setgroup, &current_action))
+       YYABORT;
+   }
+  '(' setgroupparams ')' 	{ $$ = current_action }
+| "latchgroup" 
+   { 
+     if (set_default_action (&default_latchgroup, &current_action))
+       YYABORT;
+   }
+  '(' setgroupparams ')' 	{ $$ = current_action }
+| "lockgroup"
+   {
+     if (set_default_action (&default_lockgroup, &current_action))
+       YYABORT;
+   }
+     '(' setgroupparams ')' 	{ $$ = current_action }
+| "moveptr"
+   { 
+     if (set_default_action (&default_moveptr, &current_action))
+       YYABORT;
+   }
+  '(' moveptrparams ')' 	{ $$ = current_action }
+| "ptrbtn"
+   {
+     if (set_default_action (&default_ptrbtn, &current_action))
+       YYABORT;
+   }
+  '(' ptrbtnparams ')' 		{ $$ = current_action }
+| "lockptrbtn"
+   {
+     if (set_default_action (&default_lockptrbtn, &current_action))
+       YYABORT;
+   }
+  '(' ptrbtnparams ')' 		{ $$ = current_action }
+| "setptrdflt"
+   {
+     if (set_default_action (&default_ptrdflt, &current_action))
+       YYABORT;
+   }
+  '(' ptrdfltparams ')'	 	{ $$ = current_action }
+| "setcontrols"
+   {
+     if (set_default_action (&default_setcontrols, &current_action))
+       YYABORT;
+   }
+  '(' ctrlparams ')'	 	{ $$ = current_action }
+| "lockcontrols"
+   { 
+     if (set_default_action (&default_lockcontrols, &current_action))
+       YYABORT;
+   }
+  '(' ctrlparams ')'	 	{ $$ = current_action }
+| "terminate" '(' ')'
+   { $$ = calloc (1, sizeof (xkb_action_t)); $$->type = SA_TerminateServer }
+| "switchscreen"
+   {
+     if (set_default_action (&default_switchscrn, &current_action))
+       YYABORT;
+   }
+'(' switchscrnparams ')' 	{ $$ = current_action }
+| "consscroll"
+   { 
+     if (set_default_action (&default_consscroll, &current_action))
+       YYABORT;
+   }
+   '(' consscrollparams ')' 	{ $$ = current_action }
+| "isolock"
+  { 
+    if (set_default_action (&default_isolock, &current_action))
+      YYABORT;
+  }
+  '(' isolockparams ')'	 	{ $$ = current_action }
+| "noaction" '(' ')'
+  { $$ = calloc (1, sizeof (xkb_action_t)); $$->type = SA_NoAction }
+;
+
+/* Define values for default actions.  */
+actiondef:
+  "setmods"      '.' { current_action = &default_setmods   } setmodsparam ';'
+| "latchmods"    '.' { current_action = &default_latchmods } setmodsparam ';'
+| "lockmods"     '.' { current_action = &default_lockmods } setmodsparam ';'
+| "setgroup"     '.' { current_action = &default_setgroup } setgroupparam ';'
+| "latchgroup"   '.' { current_action = &default_latchgroup } setgroupparam ';'
+| "lockgroup"    '.' { current_action = &default_lockgroup } setgroupparam ';'
+| "moveptr"      '.' { current_action = &default_moveptr } moveptrparam ';'
+| "ptrbtn"       '.' { current_action = &default_ptrbtn } ptrbtnparam ';'
+| "lockptrbtn"   '.' { current_action = &default_lockptrbtn } ptrbtnparam ';'
+| "setptrdflt"   '.' { current_action = &default_ptrdflt } ptrdfltparam ';'
+| "setcontrols"  '.' { current_action = &default_setcontrols } ctrlparams ';'
+| "lockcontrols" '.' { current_action = &default_lockcontrols } ctrlparams ';'
+| "isolock"      '.' { current_action = &default_isolock } isolockparam ';'
+| "switchscreen" '.' { current_action = &default_switchscrn } switchscrnparam ';'
+;
+
+/* The header of a symbols section.  */
+symbols:
+  "xkb_symbols" '{' symbolssect  '}' ';'
+| "xkb_symbols" string '{' symbolssect  '}' ';'
+| flags "xkb_symbols" '{' symbolssect '}' ';'
+| flags "xkb_symbols" string '{' symbolssect '}' ';'
+;
+
+/* A group.  */
+group:
+  GROUPNUM 		{ $$ = $1 - 1 }
+| NUM 			{ $$ = $1 - 1}
+;
+
+/* A list of keysyms and keycodes bound to a realmodifier.  */
+key_list:
+  key_list ',' KEYCODE		{ set_rmod_keycode ($3); free ($3) }
+| key_list ',' symbolname 	{ add_rmod_keysym ($3)  }
+| KEYCODE 			{ set_rmod_keycode ($1); free ($1) }
+| symbolname    		{ add_rmod_keysym ($1)  }
+;
+
+/* Process the includes on the stack.  */
+symbolinclude:
+  '{' symbolssect '}'			 { close_include () }
+| symbolinclude '{' symbolssect '}'	 { close_include () }
+;
+
+/* A XKB symbol section. It is used to bind keysymbols, actions and
+   realmodifiers to keycodes.  */
+symbolssect:
+	/* Empty */
+| symbolssect vmods_def
+| symbolssect NAME '[' group ']' '=' string ';'
+| symbolssect "key" KEYCODE 
+  { 
+    key_new ($3);
+    current_group = 0;
+    free ($3);
+  } '{' keydescs '}' ';'
+| symbolssect "replace" "key" KEYCODE 
+  { 
+    key_delete ($4);
+    key_new ($4);
+    current_group = 0;
+    free ($4);
+  } '{' keydescs '}' ';'
+| symbolssect "modifier_map" rmod { current_rmod = $3 } '{' key_list '}' ';'
+| symbolssect INCLUDE STR
+   { include_sections ($3, XKBSYMBOLS, "symbols", $2) }
+  symbolinclude
+| symbolssect actiondef
+;
+
+/* Returns a keysymbols, the numberic representation.  */
+symbolname:
+  IDENTIFIER { $$ = XStringToKeysym ($1); free ($1) }
+| NUM { $$ = $1 + '0' }
+;
+
+/* None or more keysyms, assigned to a single group of the current
+   key.  */
+groupsyms:
+	/* empty */
+| groupsyms ',' symbolname  
+   { key_set_keysym (current_key, current_group, symbolcnt++, $3) }
+| symbolname
+   { 
+     symbolcnt = 0;
+     key_set_keysym (current_key, current_group, symbolcnt++, $1);
+   }
+;
+
+/* A list of actions.  */
+actions:
+  actions ',' action
+   { memcpy (&keyactions[actioncnt++], $3, sizeof (struct xkb_action)) }
+| action
+   { memcpy (&keyactions[actioncnt++], $1, sizeof (struct xkb_action)) }
+;
+
+keydescs:
+  keydesc
+| keydescs ',' keydesc
+  ;
+
+/* A single key and everything assigned to it.  */
+keydesc:
+  "type" '[' group ']' '=' STR 
+   {
+     char *name = $6;
+     name++;
+     name[strlen(name) - 1] = 0;
+     current_key->groups[$3].keytype = keytype_find (name);
+     free ($6);
+   }
+| "type" '=' STR
+   { 
+     current_key->groups[current_group].keytype = keytype_find ($3);
+     free ($3);
+   }
+| { symbolcnt = 0 } "symbols" '[' group ']' '=' '[' groupsyms ']' 
+   {
+     current_key->numgroups = $4 > current_key->numgroups ?
+       $4 : current_key->numgroups;
+   }
+| {actioncnt = 0 } "actions" '[' group ']' '=' '[' actions ']' 
+   {
+     current_key->groups[$4].actions =
+       malloc (sizeof (struct xkb_action) * actioncnt);
+     if (!current_key->groups[$4].actions)
+       YYABORT;
+     memcpy (current_key->groups[$4].actions, keyactions,
+	     sizeof (struct xkb_action) * actioncnt);
+     current_key->groups[$4].actionwidth = actioncnt;
+     current_key->numgroups = $4 > current_key->numgroups ?
+       $4 : current_key->numgroups;   
+   }
+| "virtualmods" '=' mods 
+   { current_key->mods.vmods = $3.vmods }
+| { symbolcnt = 0 } '[' groupsyms ']'
+   {
+     current_group++;
+     current_key->numgroups = current_group > current_key->numgroups ? 
+       current_group : current_key->numgroups;   
+   }
+| locking {}/* This is not implemented - YET.  */
+/* XXX: There 3 features are described in Ivan Pascals docs about XKB,
+   but aren't used in the standard keymaps and cannot be used because it
+   cannot be stored in the XKM dataformat.  */
+| groupswrap {}
+| groupsclamp {}
+| "groupsredirect" '=' NUM
+| "overlay" '=' KEYCODE { free ($3) } /* If you _REALLY_ need overlays,
+					mail me!!!!  */
+| repeat  
+  {
+    current_key->flags &= ~(KEYREPEAT | KEYNOREPEAT);
+    current_key->flags |= $1;
+  }
+;
+
+/* The geometry map is ignored.  */
+
+/* The header of a geometry section.  */
+geometry:
+  "xkb_geometry" '{' { skipsection () } '}' ';'
+| "xkb_geometry" string '{' { skipsection () } '}' ';'
+| flags "xkb_geometry" '{' { skipsection () } '}' ';'
+| flags "xkb_geometry" string '{' { skipsection () } '}' ';'
+;
+
+%%
+/* A keyname with a keycode and realmodifier bound to it.  */
+struct keyname
+{
+  struct keyname *hnext;
+  struct keyname **hprevp;
+  int keycode;
+  int rmods;
+  char *keyname;
+};
+
+/* Generate a key for the string S.  XXX: The are many more effecient
+   algoritms, this one should be replaced by one of those.  */
+static int
+name_hash (char *s)
+{
+  int i = 0;
+  while (*s)
+      i += *(s++);
+  return i;
+}
+
+#define	KNHSZ	16
+#if	((KNHSZ&(KNHSZ-1)) == 0)
+#define	KNHASH(knttl)	((knttl)&(KNHSZ-1))
+#else
+#define	KNHASH(knttl)	(((unsigned)(kn))%KNHSZ)
+#endif
+
+/* Keyname to keycode mappings.  */
+static struct keyname *knhash[KNHSZ];
+
+/* Initialize the keyname hashtable.  */
+static void
+keyname_init ()
+{
+  int n;
+  for (n = 0; n < KNHSZ; n++)
+    knhash[n] = 0;
+}
+
+/* Assign the name KEYNAME to the keycode KEYCODE.  */
+static error_t
+addkeyname (char *keyname, int keycode)
+{
+  struct keyname *kn;
+
+  printf ("KK: %s\n", keyname);
+
+  int h = name_hash (keyname);
+  kn = malloc (sizeof (struct keyname));
+  if (!kn)
+    return ENOMEM;
+
+  kn->hnext = knhash[KNHASH(h)];
+  if (kn->hnext)
+    kn->hnext->hprevp = &kn->hnext;
+  kn->hprevp = &knhash[KNHASH(h)];
+  knhash[KNHASH(h)] = kn;
+  kn->keycode = keycode;
+  kn->keyname = keyname;
+  kn->rmods = 0;
+
+  return 0;
+}
+
+/* Find the numberic representation of the keycode with the name
+   KEYNAME.  */
+static int
+find_keyname (char *keyname)
+{
+  int h = name_hash (keyname);
+  struct keyname *kn;
+  for (kn = knhash[KNHASH(h)]; kn; kn = kn->hnext)
+    {
+      if (strcmp (kn->keyname, keyname))
+	continue;
+      
+      return kn->keycode;
+    }
+
+  /* XXX: Is 0 an invalid keycode?  */
+  return 0;
+}
+
+static void
+yyerror (char *s)
+{
+  fprintf (stderr, "%s\n", s);
+  exit (EXIT_FAILURE);
+}
+
+#define	KTHSZ	16
+#if	((KTHSZ&(KTHSZ-1)) == 0)
+#define	KTHASH(ktttl)	((ktttl)&(KTHSZ-1))
+#else
+#define	KTHASH(ktttl)	(((unsigned)(kt))%KTHSZ)
+#endif
+
+/* All keytypes.  */
+struct keytype *kthash[KTHSZ];
+
+/* Initialize the keytypes hashtable.  */
+static void
+keytype_init ()
+{
+  int n;
+  for (n = 0; n < KTHSZ; n++)
+    kthash[n] = 0;
+}
+
+/* Search the keytype with the name NAME.  */
+struct keytype *
+keytype_find (char *name)
+{
+  int nhash = name_hash (name);
+  struct keytype *kt;
+
+  for (kt = kthash[KTHASH(nhash)]; kt; kt = kt->hnext)
+    if (!strcmp (name, kt->name))
+      return kt;
+  return NULL;
+}
+
+/* Remove the keytype KT.  */
+static void
+keytype_delete (struct keytype *kt)
+{
+  struct typemap *map;
+
+
+  *kt->prevp = kt->hnext;
+  if (kt->hnext)
+    kt->hnext->prevp = kt->prevp;
+      
+  map = kt->maps;
+  while (map)
+    {
+      struct typemap *nextmap = map->next;
+      free (map);
+      map = nextmap;
+    }
+  
+}
+
+/* Create a new keytype with the name NAME.  */
+static error_t
+keytype_new (char *name, struct keytype **new_kt)
+{
+  struct keytype *kt;
+  struct keytype *ktlist;
+  int nhash;
+  
+  name++;
+  strchr (name, '\0')[-1] = 0;
+
+  nhash = name_hash (name);
+
+  kt = keytype_find (name);
+
+  if (kt)
+    {
+      /* If the merge mode is augement don't replace it.  */
+      if (merge_mode == augment)
+	{
+	  *new_kt = &dummy_keytype;
+	  return 0;
+	}
+      else /* This keytype should replace the old one, remove the old one.  */
+	keytype_delete (kt);
+    }
+
+  ktlist = kthash[KTHASH(nhash)];
+  kt = calloc (1, sizeof (struct keytype));
+  if (kt == NULL)
+    return ENOMEM;
+
+  kt->hnext = ktlist;
+  kt->name = strdup (name);
+  kt->prevp = &kthash[KTHASH(nhash)];
+  kt->maps = NULL;
+  if (kthash[KTHASH(nhash)])
+    kthash[KTHASH(nhash)]->prevp = &(kt->hnext);
+  kthash[KTHASH(nhash)] = kt;
+
+  *new_kt = kt;
+  return 0;
+}
+
+/* Add a level (LEVEL) to modifiers (MODS) mapping to the current
+   keytype.  */
+static error_t
+keytype_mapadd (struct keytype *kt, modmap_t mods, int level)
+{
+  struct typemap *map;
+  modmap_t nulmap = {0, 0};
+
+  map = malloc (sizeof (struct typemap));
+  if (!map)
+    return ENOMEM;
+
+  map->level = level;
+  map->mods = mods;
+  map->preserve = nulmap;
+  /* By default modifiers shouldn't be preserved.  */
+  map->next = kt->maps;
+  
+  kt->maps = map;
+
+  return 0;
+}
+
+/* Last number assigned to a virtual modifier.  */
+static int lastvmod = 0;
+
+/* One virtual modifiername -> vmod number mapping.  */
+struct vmodname
+{
+  char *name;
+  struct vmodname *next;
+};
+
+/* A list of virtualmodifier names and its numberic representation.  */
+static struct vmodname *vmodnamel;
+
+/* Get the number assigned to the virtualmodifier with the name
+   VMODNAME.  */
+static int
+get_vmod (char *vmodname)
+{
+  int i = 0;
+  struct vmodname *vmn = vmodnamel;
+
+  while (vmn)
+    {
+      if (!strcmp (vmn->name, vmodname))
+	return (lastvmod - i);
+      vmn = vmn->next;
+      i++;
+    }
+
+  return 0;
+}
+
+/* Give the virtualmodifier VMODNAME a number and add it to the
+   hashtable.  */
+static error_t
+add_vmod (char *vmodname)
+{
+  struct vmodname *vmn;
+
+  if (get_vmod (vmodname))
+    return 0;
+
+  vmn = malloc (sizeof (struct vmodname));
+  if (vmn == NULL)
+    return ENOMEM;
+
+  vmn->name = vmodname;
+  vmn->next = vmodnamel;
+  vmodnamel = vmn;
+
+  lastvmod++;
+
+  return 0;
+}
+
+/* For the current keytype the modifiers PRESERVE should be preserved
+   when the modifiers MODS are pressed.  */
+static error_t
+preserve_add (struct keytype *kt, modmap_t mods, modmap_t preserve)
+{
+  error_t err;
+  struct typemap *map;
+
+  map = kt->maps;
+  while (map)
+    {
+      if (mods.rmods == map->mods.rmods && mods.vmods == map->mods.vmods)
+	{
+	  map->preserve = preserve;
+	  return 0;
+	}
+      map = map->next;
+    }
+
+  /* No map has been found, add the default map.  */
+  err = keytype_mapadd (kt, mods, 0);
+  if (err)
+    return err;
+
+  preserve_add (kt, mods, preserve);
+
+  return 0;
+}
+
+/* Add a new interpretation.  */
+static error_t
+new_interp (xkm_interpret_t **new_interpret, symbol ks)
+{
+  struct xkm_interpret *new_interp;
+
+  new_interp = malloc (sizeof (struct xkm_interpret));
+  if (!new_interp)
+    return ENOMEM;
+
+  memcpy (new_interp, &default_interpretation, sizeof (struct xkm_interpret));
+  new_interp->symbol = ks;
+
+  if (ks)
+    {
+      new_interp->next = interpretations;
+      interpretations = new_interp;
+
+      if (!last_interp)
+	last_interp = new_interp;
+    }
+  else
+    {
+      if (last_interp)
+	last_interp->next = new_interp;
+      
+      last_interp = new_interp;
+      
+      if (!interpretations)
+	interpretations = new_interp; 
+    }
+
+  *new_interpret = new_interp;
+
+  return 0;
+}
+
+
+/* Skip all tokens until a section of the type SECTIONSYMBOL with the
+   name SECTIONNAME is found.  */
+static void
+skip_to_sectionname (char *sectionname, int sectionsymbol)
+{
+  int symbol;
+
+  do 
+    {
+      do 
+	{
+	  symbol = yylex ();
+	} while (symbol != sectionsymbol);
+      symbol = yylex ();
+      yylval.str++;
+      yylval.str[strlen (yylval.str) - 1] = '\0';
+
+      if (symbol != STR)
+	continue;
+    } while (strcmp (yylval.str, sectionname));
+}
+
+/* Skip all tokens until the default section is found.  */
+static void
+skip_to_defaultsection (void)
+{
+  int symbol;
+
+  /* Search the default section.  */
+  do
+    {
+      symbol = yylex ();
+    } while (symbol != DEFAULT);
+
+  do
+    {
+      symbol = yylex ();
+    } while (symbol != '{');
+  scanner_unput ('{');
+}
+
+/* Include a single file. INCL is the filename. SECTIONSYMBOL is the
+   token that marks the beginning of the section. DIRNAME is the name
+   of the directory from where the includefiles must be loaded. NEW_MM
+   is the mergemode that should be used.  */
+static error_t
+include_section (char *incl, int sectionsymbol, char *dirname,
+		 mergemode new_mm)
+{
+  void include_file (FILE *, mergemode);
+  char *filename;
+  char *sectionname = NULL;
+  FILE *includefile;
+  
+  sectionname = strchr (incl, '(');
+  if (sectionname)
+    {
+      int snlen;
+
+      snlen = strlen (sectionname);
+      if (sectionname[snlen-1] != ')')
+	return 0;
+      sectionname[snlen-1] = '\0';
+      sectionname[0] = '\0';
+      sectionname++;
+
+      if (asprintf (&filename, "%s/%s", dirname, incl) < 0)
+	return ENOMEM;
+    }
+  else
+    {
+      if (asprintf (&filename, "%s/%s", dirname, incl) < 0)
+	return ENOMEM;
+    }
+
+  includefile = fopen (strdup (filename), "r");
+  
+  if (includefile == NULL)
+    {
+      fprintf (stderr, "Couldn't open include file \"%s\"\n", filename);
+      exit (EXIT_FAILURE);
+    }
+  
+  include_file (includefile, new_mm);
+
+  /* If there is a sectionname not the entire file should be included,
+     the scanner should be positioned at the required section.  */
+  if (sectionname)
+      skip_to_sectionname (sectionname, sectionsymbol);
+  else
+      skip_to_defaultsection ();
+
+  return 0;
+}
+
+/* Include multiple file sections, seperated by '+'. INCL is the
+   include string. SECTIONSYMBOL is the token that marks the beginning
+   of the section. DIRNAME is the name of the directory from where the
+   includefiles must be loaded. NEW_MM is the mergemode that should be
+   used.  */
+static error_t
+include_sections (char *incl, int sectionsymbol, char *dirname,
+		  mergemode new_mm)
+{
+  char *curstr;
+  char *s;
+
+  if (new_mm == defaultmm)
+    new_mm = merge_mode;
+
+  incl++;
+  incl[strlen (incl) - 1] = '\0';
+
+  /* Cut of all includes, starting with the first.  The includes are
+     pushed on the stack in reversed order.  */
+  do {
+    curstr = strrchr (incl, '+');
+    if (curstr)
+      {
+	curstr[0] = '\0';
+	curstr++;
+
+	s = strdup (curstr);
+	if (s == NULL)
+	  return ENOMEM;
+	
+	include_section (s, sectionsymbol, dirname, new_mm);
+	free (s);
+      }
+  } while (curstr);
+  
+  s = strdup (incl);
+  if (s == NULL)
+      return ENOMEM;
+  
+  include_section (s, sectionsymbol, dirname, new_mm);
+  free (s);
+
+  return 0;
+}
+
+/* Skip all tokens until the end of the section is reached.  */
+static void
+skipsection (void)
+{
+  /* Pathesensis counter.  */
+  int p = 0;
+  while (p >= 0)
+    {
+      int symbol = yylex ();
+      if (symbol == '{')
+	p++;
+      if (symbol == '}')
+	p--;
+    }
+  scanner_unput ('}');
+}
+
+/* Initialize the default action with the default DEF.  */
+static error_t
+set_default_action (struct xkb_action *def, 
+		    struct xkb_action **newact)
+{
+  struct xkb_action *newaction;
+  newaction = malloc (sizeof (struct xkb_action));
+  if (newaction == NULL)
+    return ENOMEM;
+  memcpy (newaction, def, sizeof (struct xkb_action));  
+  
+  *newact = newaction;
+  
+  return 0;
+}
+
+/* Remove all keysyms bound to the group GROUP or the key KEY.  */
+static void
+remove_symbols (struct key *key, group group)
+{
+  if (key->groups[group].symbols)
+    {
+      free (key->groups[group].symbols);
+      key->groups[group].symbols = NULL;
+      key->groups[group].width = 0;
+    }
+}
+
+/* Set the keysym KS for key KEY on group GROUP and level LEVEL.  */
+static void
+key_set_keysym (struct key *key, group group, int level, symbol ks)
+{
+  symbol *keysyms = key->groups[group].symbols;
+
+  if ((level + 1) > key->groups[group].width)
+    {
+      keysyms = realloc (keysyms, level + 1);
+
+      if (!keys)
+	{
+	  fprintf (stderr, "No mem\n");
+	  exit (EXIT_FAILURE);
+	}
+	 
+      key->groups[group].symbols = keysyms;
+      key->groups[group].width++;
+    }
+     
+  keysyms[level++] = ks;
+}
+
+/* Delete keycode to keysym mapping.  */
+void
+key_delete (char *keyname)
+{
+  group group;
+  keycode kc = find_keyname (keyname);
+  
+  current_key = &keys[kc];
+  for (group = 0; group < 4; group++)
+    remove_symbols (current_key, group);
+  memset (current_key, 0, sizeof (struct key));
+
+}
+
+/* Create a new keycode to keysym mapping, check if the old one should
+   be removed or preserved.  */
+static void
+key_new (char *keyname)
+{
+  int isempty (char *mem, int size)
+    {
+      int i;
+      for (i = 0; i < size; i++)
+	if (mem[i])
+	  return 0;
+      return 1;
+    }
+
+  keycode kc = find_keyname (keyname);
+
+  if (merge_mode == augment)
+    {
+      if (!isempty ((char *) &keys[kc], sizeof (struct key)))
+	{
+	  current_key = &dummy_key;
+	  return;
+	}
+      else
+	current_key = &keys[kc];
+    }
+    
+  if (merge_mode == override)
+      current_key = &keys[kc];
+
+  if (merge_mode == replace)
+    {
+      key_delete (keyname);
+    }
+}
+
+/* Set the current rmod for the key with keyname KEYNAME.  */
+/* XXX: It shouldn't be applied immediatly because the key can be
+   replaced.  */
+static void
+set_rmod_keycode (char *keyname)
+{  
+  keycode kc = find_keyname (keyname);
+  keys[kc].mods.rmods = current_rmod;
+}
+
+#define	RMKSHSZ	50
+#if	((KTHSZ&(KTHSZ-1)) == 0)
+#define	RMKSHASH(rmksttl)	((rmksttl)&(RMKSHSZ-1))
+#else
+#define	RMKSHASH(rmksttl)	(((unsigned)(rmks))%RMKSHSZ)
+#endif
+
+/* Real modifier to keysym mapping.  */
+struct rmks
+{
+  symbol ks;
+  /* The real modifiers bound to the keysym KS.  */
+  int rmods;
+  struct rmks *hnext;
+} *rmkshash[RMKSHSZ];
+
+/* Initialize the list for keysyms to realmodifiers mappings.  */
+static void
+rmks_init ()
+{
+  int n;
+  for (n = 0; n < RMKSHSZ; n++)
+    rmkshash[n] = 0;
+}
+
+/* Add keysym to realmodifier mapping.  */
+static error_t
+add_rmod_keysym (symbol ks)
+{
+  struct rmks *rmks;
+
+  for (rmks = rmkshash[RMKSHASH (ks)]; rmks; rmks = rmks->hnext)
+    if (rmks->ks == ks)
+      {
+	rmks->rmods = current_rmod;
+	return 0;
+      }
+  
+  /* There is no entry for this keysym, create it.  */
+  rmks = malloc (sizeof (struct rmks));
+  if (rmks == NULL)
+    return ENOMEM;
+
+  rmks->ks = ks;
+  rmks->rmods = current_rmod;
+  rmks->hnext = rmkshash[RMKSHASH (ks)];
+  rmkshash[RMKSHASH (ks)] = rmks;
+
+  return 0;
+}
+
+/* Apply the rkms (realmods to keysyms) table to all keysyms.  */
+void
+set_rmod_keysyms (void)
+{
+  keycode kc;
+  for (kc = 0; kc < max_keys; kc++)
+    {
+      int group;
+      for (group = 0; group < 4; group++)
+	{
+	  int cursym;
+	  for (cursym = 0; cursym < keys[kc].groups[group].width; cursym++)
+	    {
+	      symbol ks = keys[kc].groups[group].symbols[cursym];
+	      struct rmks *rmks;
+
+	      for (rmks = rmkshash[RMKSHASH (ks)]; rmks; rmks = rmks->hnext)
+		/* If the symbol for key KC is found in the table
+		   assign the rmod that belongs to this symbol to key
+		   KC.  */
+		if (rmks->ks == ks)
+		  keys[kc].mods.rmods = rmks->rmods;
+	    }
+	}
+    }
+}
+
+
+/* Load the XKB configuration from the section XKBKEYMAP in the
+   keymapfile XKBKEYMAPFILE. Use XKBDIR as root directory for relative
+   pathnames.  */
+error_t
+parse_xkbconfig (char *xkbdir, char *xkbkeymapfile, char *xkbkeymap)
+{
+  error_t err;
+  char *cwd = getcwd (NULL, 0);
+  extern FILE *yyin;
+
+  //  yydebug = 1;
+  keyname_init ();
+  keytype_init ();
+  rmks_init ();
+  err = chdir (xkbdir);
+  if (err)
+    {
+      fprintf (stderr, "Could not set \"%s\" as the active directory\n", 
+	       xkbdir);
+      return err;
+    }
+
+  yyin = fopen (xkbkeymapfile, "r");
+  if (yyin == NULL)
+    {
+      fprintf (stderr, "Couldn't open keymap file\n");
+      return errno;
+    }
+
+  if (xkbkeymap)
+    skip_to_sectionname (xkbkeymap, XKBKEYMAP);
+  err = yyparse ();
+
+  err = chdir (xkbdir);
+  if (err)
+    {
+      fprintf (stderr, "Could not set \"%s\" as the active directory\n", cwd);
+      return err;
+    }
+
+  set_rmod_keysyms ();
+
+  free (cwd);
+  return 0;
+}
