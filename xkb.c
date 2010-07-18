@@ -1725,15 +1725,11 @@ xkb_init (void **handle, int no_exit, int argc, char **argv, int *next)
   
   /* Defaults. */
   if (!arguments.xkbdir)
-    arguments.xkbdir = "/home/marco/xkb";
-  /* debug: */
-/*   arguments.keymapfile = "keymap/hurd"; */
-/*   arguments.keymap = "Hurd"; */
-/*   arguments.xkbdir = "/home/marco/xkb"; */
-/*   arguments.keymapfile = "keymap/xfree86"; */
-/*   arguments.keymap = "us"; */
-
-  
+    {
+      arguments.xkbdir = "/share/X11/xkb";
+      arguments.keymapfile = "keymap/hurd";
+    }
+    
   ctrlaltbs = arguments.ctrlaltbs;
   
   if (arguments.composefile)
