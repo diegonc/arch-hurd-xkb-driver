@@ -100,8 +100,8 @@ static int MouseKeys = 0;
 /* Default mousebutton. */
 static int default_button = 0;
 
-static xkb_indicator_t *indicators;
-static int indicator_count;
+xkb_indicator_t *indicators;
+int indicator_count;
 static int indicator_map = 0;
 
 static int stickykeys_active = 1;
