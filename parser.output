@@ -5,9 +5,9 @@ Grammar
     1 xkbkeymap: "xkb_keymap" '{' keymap '}' ';'
     2          | "xkb_keymap" STR '{' keymap '}' ';'
 
-    3 @1: /* empty */
+    3 $@1: /* empty */
 
-    4 xkbkeymap: '{' keymap '}' @1 ';'
+    4 xkbkeymap: '{' keymap '}' $@1 ';'
 
     5 keymap: /* empty */
     6       | keymap types
@@ -34,23 +34,23 @@ Grammar
    22            | "minimum" '=' NUM ';' keycodesect
    23            | "maximum" '=' NUM ';' keycodesect
 
-   24 @2: /* empty */
+   24 $@2: /* empty */
 
-   25 keycodesect: KEYCODE '=' NUM ';' @2 keycodesect
+   25 keycodesect: KEYCODE '=' NUM ';' $@2 keycodesect
 
-   26 @3: /* empty */
+   26 $@3: /* empty */
 
-   27 keycodesect: "replace" KEYCODE '=' NUM ';' @3 keycodesect
+   27 keycodesect: "replace" KEYCODE '=' NUM ';' $@3 keycodesect
    28            | "indicator" NUM '=' STR ';' keycodesect
    29            | "virtual" "indicator" NUM '=' STR ';' keycodesect
 
-   30 @4: /* empty */
+   30 $@4: /* empty */
 
-   31 keycodesect: "alias" KEYCODE '=' KEYCODE ';' @4 keycodesect
+   31 keycodesect: "alias" KEYCODE '=' KEYCODE ';' $@4 keycodesect
 
-   32 @5: /* empty */
+   32 $@5: /* empty */
 
-   33 keycodesect: include STR @5 keycodesinclude keycodesect
+   33 keycodesect: include STR $@5 keycodesinclude keycodesect
 
    34 types: flags "xkb_types" '{' typessect '}' ';'
    35      | flags "xkb_types" STR '{' typessect '}' ';'
@@ -100,13 +100,13 @@ Grammar
    66 typessect: /* empty */
    67          | typessect vmods_def
 
-   68 @8: /* empty */
+   68 $@8: /* empty */
 
-   69 typessect: typessect "type" STR @8 '{' type '}' ';'
+   69 typessect: typessect "type" STR $@8 '{' type '}' ';'
 
-   70 @9: /* empty */
+   70 $@9: /* empty */
 
-   71 typessect: typessect include STR @9 typesinclude
+   71 typessect: typessect include STR $@9 typesinclude
 
    72 compat: flags "xkb_compatibility" '{' compatsect '}' ';'
    73       | flags "xkb_compatibility" STR '{' compatsect '}' ';'
@@ -161,31 +161,31 @@ Grammar
   111 compatsect: /* empty */
   112           | compatsect vmods_def
 
-  113 @10: /* empty */
+  113 $@10: /* empty */
 
-  114 compatsect: compatsect "interpret" '.' @10 interpret
+  114 compatsect: compatsect "interpret" '.' $@10 interpret
 
-  115 @11: /* empty */
+  115 $@11: /* empty */
 
-  116 compatsect: compatsect "interpret" symbol @11 '{' interprets '}' ';'
+  116 compatsect: compatsect "interpret" symbol $@11 '{' interprets '}' ';'
 
-  117 @12: /* empty */
+  117 $@12: /* empty */
 
-  118 compatsect: compatsect "interpret" symbol '+' rmod @12 '{' interprets '}' ';'
+  118 compatsect: compatsect "interpret" symbol '+' rmod $@12 '{' interprets '}' ';'
 
-  119 @13: /* empty */
+  119 $@13: /* empty */
 
-  120 compatsect: compatsect "interpret" symbol '+' "any" @13 '{' interprets '}' ';'
+  120 compatsect: compatsect "interpret" symbol '+' "any" $@13 '{' interprets '}' ';'
 
-  121 @14: /* empty */
+  121 $@14: /* empty */
 
-  122 compatsect: compatsect "interpret" symbol '+' INTERPMATCH '(' mods ')' @14 '{' interprets '}' ';'
+  122 compatsect: compatsect "interpret" symbol '+' INTERPMATCH '(' mods ')' $@14 '{' interprets '}' ';'
   123           | compatsect "group" NUM '=' mods ';'
   124           | compatsect "indicator" STR '{' indicators '}' ';'
 
-  125 @15: /* empty */
+  125 $@15: /* empty */
 
-  126 compatsect: compatsect include STR @15 compatinclude
+  126 compatsect: compatsect include STR $@15 compatinclude
   127           | compatsect actiondef
   128           | compatsect "indicator" '.' indicator
 
@@ -345,125 +345,125 @@ Grammar
   249 privateparam: "type" '=' HEX
   250             | "data" '=' STR
 
-  251 @16: /* empty */
+  251 $@16: /* empty */
 
-  252 action: "setmods" @16 '(' setmodsparams ')'
+  252 action: "setmods" $@16 '(' setmodsparams ')'
 
-  253 @17: /* empty */
+  253 $@17: /* empty */
 
-  254 action: "latchmods" @17 '(' setmodsparams ')'
+  254 action: "latchmods" $@17 '(' setmodsparams ')'
 
-  255 @18: /* empty */
+  255 $@18: /* empty */
 
-  256 action: "lockmods" @18 '(' setmodsparams ')'
+  256 action: "lockmods" $@18 '(' setmodsparams ')'
 
-  257 @19: /* empty */
+  257 $@19: /* empty */
 
-  258 action: "setgroup" @19 '(' setgroupparams ')'
+  258 action: "setgroup" $@19 '(' setgroupparams ')'
 
-  259 @20: /* empty */
+  259 $@20: /* empty */
 
-  260 action: "latchgroup" @20 '(' setgroupparams ')'
+  260 action: "latchgroup" $@20 '(' setgroupparams ')'
 
-  261 @21: /* empty */
+  261 $@21: /* empty */
 
-  262 action: "lockgroup" @21 '(' setgroupparams ')'
+  262 action: "lockgroup" $@21 '(' setgroupparams ')'
 
-  263 @22: /* empty */
+  263 $@22: /* empty */
 
-  264 action: "moveptr" @22 '(' moveptrparams ')'
+  264 action: "moveptr" $@22 '(' moveptrparams ')'
 
-  265 @23: /* empty */
+  265 $@23: /* empty */
 
-  266 action: "ptrbtn" @23 '(' ptrbtnparams ')'
+  266 action: "ptrbtn" $@23 '(' ptrbtnparams ')'
 
-  267 @24: /* empty */
+  267 $@24: /* empty */
 
-  268 action: "lockptrbtn" @24 '(' ptrbtnparams ')'
+  268 action: "lockptrbtn" $@24 '(' ptrbtnparams ')'
 
-  269 @25: /* empty */
+  269 $@25: /* empty */
 
-  270 action: "setptrdflt" @25 '(' ptrdfltparams ')'
+  270 action: "setptrdflt" $@25 '(' ptrdfltparams ')'
 
-  271 @26: /* empty */
+  271 $@26: /* empty */
 
-  272 action: "setcontrols" @26 '(' ctrlparams ')'
+  272 action: "setcontrols" $@26 '(' ctrlparams ')'
 
-  273 @27: /* empty */
+  273 $@27: /* empty */
 
-  274 action: "lockcontrols" @27 '(' ctrlparams ')'
+  274 action: "lockcontrols" $@27 '(' ctrlparams ')'
   275       | "terminate" '(' ')'
 
-  276 @28: /* empty */
+  276 $@28: /* empty */
 
-  277 action: "switchscreen" @28 '(' switchscrnparams ')'
+  277 action: "switchscreen" $@28 '(' switchscrnparams ')'
 
-  278 @29: /* empty */
+  278 $@29: /* empty */
 
-  279 action: "consscroll" @29 '(' consscrollparams ')'
+  279 action: "consscroll" $@29 '(' consscrollparams ')'
 
-  280 @30: /* empty */
+  280 $@30: /* empty */
 
-  281 action: "isolock" @30 '(' isolockparams ')'
+  281 action: "isolock" $@30 '(' isolockparams ')'
   282       | "private" '(' privateparams ')'
   283       | "noaction" '(' ')'
   284       | error ')'
 
-  285 @31: /* empty */
+  285 $@31: /* empty */
 
-  286 actiondef: "setmods" '.' @31 setmodsparam ';'
+  286 actiondef: "setmods" '.' $@31 setmodsparam ';'
 
-  287 @32: /* empty */
+  287 $@32: /* empty */
 
-  288 actiondef: "latchmods" '.' @32 setmodsparam ';'
+  288 actiondef: "latchmods" '.' $@32 setmodsparam ';'
 
-  289 @33: /* empty */
+  289 $@33: /* empty */
 
-  290 actiondef: "lockmods" '.' @33 setmodsparam ';'
+  290 actiondef: "lockmods" '.' $@33 setmodsparam ';'
 
-  291 @34: /* empty */
+  291 $@34: /* empty */
 
-  292 actiondef: "setgroup" '.' @34 setgroupparam ';'
+  292 actiondef: "setgroup" '.' $@34 setgroupparam ';'
 
-  293 @35: /* empty */
+  293 $@35: /* empty */
 
-  294 actiondef: "latchgroup" '.' @35 setgroupparam ';'
+  294 actiondef: "latchgroup" '.' $@35 setgroupparam ';'
 
-  295 @36: /* empty */
+  295 $@36: /* empty */
 
-  296 actiondef: "lockgroup" '.' @36 setgroupparam ';'
+  296 actiondef: "lockgroup" '.' $@36 setgroupparam ';'
 
-  297 @37: /* empty */
+  297 $@37: /* empty */
 
-  298 actiondef: "moveptr" '.' @37 moveptrparam ';'
+  298 actiondef: "moveptr" '.' $@37 moveptrparam ';'
 
-  299 @38: /* empty */
+  299 $@38: /* empty */
 
-  300 actiondef: "ptrbtn" '.' @38 ptrbtnparam ';'
+  300 actiondef: "ptrbtn" '.' $@38 ptrbtnparam ';'
 
-  301 @39: /* empty */
+  301 $@39: /* empty */
 
-  302 actiondef: "lockptrbtn" '.' @39 ptrbtnparam ';'
+  302 actiondef: "lockptrbtn" '.' $@39 ptrbtnparam ';'
 
-  303 @40: /* empty */
+  303 $@40: /* empty */
 
-  304 actiondef: "setptrdflt" '.' @40 ptrdfltparam ';'
+  304 actiondef: "setptrdflt" '.' $@40 ptrdfltparam ';'
 
-  305 @41: /* empty */
+  305 $@41: /* empty */
 
-  306 actiondef: "setcontrols" '.' @41 ctrlparams ';'
+  306 actiondef: "setcontrols" '.' $@41 ctrlparams ';'
 
-  307 @42: /* empty */
+  307 $@42: /* empty */
 
-  308 actiondef: "lockcontrols" '.' @42 ctrlparams ';'
+  308 actiondef: "lockcontrols" '.' $@42 ctrlparams ';'
 
-  309 @43: /* empty */
+  309 $@43: /* empty */
 
-  310 actiondef: "isolock" '.' @43 isolockparam ';'
+  310 actiondef: "isolock" '.' $@43 isolockparam ';'
 
-  311 @44: /* empty */
+  311 $@44: /* empty */
 
-  312 actiondef: "switchscreen" '.' @44 switchscrnparam ';'
+  312 actiondef: "switchscreen" '.' $@44 switchscrnparam ';'
 
   313 symbols: flags "xkb_symbols" '{' symbolssect '}' ';'
   314        | flags "xkb_symbols" STR '{' symbolssect '}' ';'
@@ -484,30 +484,30 @@ Grammar
   325            | symbolssect vmods_def
   326            | symbolssect "name" '[' group ']' '=' STR ';'
 
-  327 @45: /* empty */
+  327 $@45: /* empty */
 
-  328 symbolssect: symbolssect "key" KEYCODE @45 '{' keydescs '}' ';'
+  328 symbolssect: symbolssect "key" KEYCODE $@45 '{' keydescs '}' ';'
 
-  329 @46: /* empty */
+  329 $@46: /* empty */
 
-  330 symbolssect: symbolssect "replace" "key" KEYCODE @46 '{' keydescs '}' ';'
+  330 symbolssect: symbolssect "replace" "key" KEYCODE $@46 '{' keydescs '}' ';'
 
-  331 @47: /* empty */
+  331 $@47: /* empty */
 
-  332 symbolssect: symbolssect "override" "key" KEYCODE @47 '{' keydescs '}' ';'
+  332 symbolssect: symbolssect "override" "key" KEYCODE $@47 '{' keydescs '}' ';'
 
-  333 @48: /* empty */
+  333 $@48: /* empty */
 
-  334 symbolssect: symbolssect "modifier_map" rmod @48 '{' key_list '}' ';'
+  334 symbolssect: symbolssect "modifier_map" rmod $@48 '{' key_list '}' ';'
 
-  335 @49: /* empty */
+  335 $@49: /* empty */
 
-  336 symbolssect: symbolssect include STR @49 symbolinclude
+  336 symbolssect: symbolssect include STR $@49 symbolinclude
   337            | symbolssect actiondef
 
-  338 @50: /* empty */
+  338 $@50: /* empty */
 
-  339 symbolssect: symbolssect "key" '.' @50 keydesc ';'
+  339 symbolssect: symbolssect "key" '.' $@50 keydesc ';'
   340            | symbolssect error ';'
 
   341 symbolname: IDENTIFIER
@@ -516,15 +516,15 @@ Grammar
   343 groupsyms: /* empty */
   344          | groupsyms ',' symbolname
 
-  345 @51: /* empty */
+  345 $@51: /* empty */
 
-  346 groupsyms: @51 symbolname
+  346 groupsyms: $@51 symbolname
 
   347 actions: actions ',' action
 
-  348 @52: /* empty */
+  348 $@52: /* empty */
 
-  349 actions: @52 action
+  349 actions: $@52 action
 
   350 keydescs: keydesc
   351         | keydescs ',' keydesc
@@ -533,17 +533,17 @@ Grammar
   353        | "type" '[' error ']'
   354        | "type" '=' STR
 
-  355 @53: /* empty */
+  355 $@53: /* empty */
 
-  356 @54: /* empty */
+  356 $@54: /* empty */
 
-  357 keydesc: @53 "symbols" '[' group ']' @54 '=' '[' groupsyms ']'
+  357 keydesc: $@53 "symbols" '[' group ']' $@54 '=' '[' groupsyms ']'
 
-  358 @55: /* empty */
+  358 $@55: /* empty */
 
-  359 @56: /* empty */
+  359 $@56: /* empty */
 
-  360 keydesc: @55 "actions" '[' group ']' @56 '=' '[' actions ']'
+  360 keydesc: $@55 "actions" '[' group ']' $@56 '=' '[' actions ']'
   361        | "virtualmods" '=' mods
   362        | '[' groupsyms ']'
   363        | '[' actions ']'
@@ -554,13 +554,13 @@ Grammar
   368        | "overlay" '=' KEYCODE
   369        | repeat
 
-  370 @57: /* empty */
+  370 $@57: /* empty */
 
-  371 geometry: flags "xkb_geometry" '{' @57 '}' ';'
+  371 geometry: flags "xkb_geometry" '{' $@57 '}' ';'
 
-  372 @58: /* empty */
+  372 $@58: /* empty */
 
-  373 geometry: flags "xkb_geometry" STR '{' @58 '}' ';'
+  373 geometry: flags "xkb_geometry" STR '{' $@58 '}' ';'
 
 
 Terminals, with rules where they appear
@@ -707,7 +707,7 @@ $accept (121)
     on left: 0
 xkbkeymap (122)
     on left: 1 2 4, on right: 0
-@1 (123)
+$@1 (123)
     on left: 3, on right: 4
 keymap (124)
     on left: 5 6 7 8 9 10, on right: 1 2 4 6 7 8 9 10
@@ -722,13 +722,13 @@ keycodesinclude (128)
 keycodesect (129)
     on left: 21 22 23 25 27 28 29 31 33, on right: 17 18 19 20 22 23
     25 27 28 29 31 33
-@2 (130)
+$@2 (130)
     on left: 24, on right: 25
-@3 (131)
+$@3 (131)
     on left: 26, on right: 27
-@4 (132)
+$@4 (132)
     on left: 30, on right: 31
-@5 (133)
+$@5 (133)
     on left: 32, on right: 33
 types (134)
     on left: 34 35, on right: 6
@@ -755,9 +755,9 @@ typesinclude (144)
     on left: 64 65, on right: 65 71
 typessect (145)
     on left: 66 67 69 71, on right: 34 35 64 65 67 69 71
-@8 (146)
+$@8 (146)
     on left: 68, on right: 69
-@9 (147)
+$@9 (147)
     on left: 70, on right: 71
 compat (148)
     on left: 72 73, on right: 8
@@ -782,20 +782,19 @@ interpret (157)
 compatinclude (158)
     on left: 109 110, on right: 110 126
 compatsect (159)
-    on left: 111 112 114 116 118 120 122 123 124 126 127 128,
-    on right: 72 73 109 110 112 114 116 118 120 122 123 124 126 127
-    128
-@10 (160)
+    on left: 111 112 114 116 118 120 122 123 124 126 127 128, on right:
+    72 73 109 110 112 114 116 118 120 122 123 124 126 127 128
+$@10 (160)
     on left: 113, on right: 114
-@11 (161)
+$@11 (161)
     on left: 115, on right: 116
-@12 (162)
+$@12 (162)
     on left: 117, on right: 118
-@13 (163)
+$@13 (163)
     on left: 119, on right: 120
-@14 (164)
+$@14 (164)
     on left: 121, on right: 122
-@15 (165)
+$@15 (165)
     on left: 125, on right: 126
 clearlocks (166)
     on left: 129 130 131 132, on right: 170 179
@@ -868,66 +867,66 @@ privateparam (199)
 action (200)
     on left: 252 254 256 258 260 262 264 266 268 270 272 274 275 277
     279 281 282 283 284, on right: 108 347 349
-@16 (201)
+$@16 (201)
     on left: 251, on right: 252
-@17 (202)
+$@17 (202)
     on left: 253, on right: 254
-@18 (203)
+$@18 (203)
     on left: 255, on right: 256
-@19 (204)
+$@19 (204)
     on left: 257, on right: 258
-@20 (205)
+$@20 (205)
     on left: 259, on right: 260
-@21 (206)
+$@21 (206)
     on left: 261, on right: 262
-@22 (207)
+$@22 (207)
     on left: 263, on right: 264
-@23 (208)
+$@23 (208)
     on left: 265, on right: 266
-@24 (209)
+$@24 (209)
     on left: 267, on right: 268
-@25 (210)
+$@25 (210)
     on left: 269, on right: 270
-@26 (211)
+$@26 (211)
     on left: 271, on right: 272
-@27 (212)
+$@27 (212)
     on left: 273, on right: 274
-@28 (213)
+$@28 (213)
     on left: 276, on right: 277
-@29 (214)
+$@29 (214)
     on left: 278, on right: 279
-@30 (215)
+$@30 (215)
     on left: 280, on right: 281
 actiondef (216)
-    on left: 286 288 290 292 294 296 298 300 302 304 306 308 310 312
-   , on right: 127 337
-@31 (217)
+    on left: 286 288 290 292 294 296 298 300 302 304 306 308 310 312,
+    on right: 127 337
+$@31 (217)
     on left: 285, on right: 286
-@32 (218)
+$@32 (218)
     on left: 287, on right: 288
-@33 (219)
+$@33 (219)
     on left: 289, on right: 290
-@34 (220)
+$@34 (220)
     on left: 291, on right: 292
-@35 (221)
+$@35 (221)
     on left: 293, on right: 294
-@36 (222)
+$@36 (222)
     on left: 295, on right: 296
-@37 (223)
+$@37 (223)
     on left: 297, on right: 298
-@38 (224)
+$@38 (224)
     on left: 299, on right: 300
-@39 (225)
+$@39 (225)
     on left: 301, on right: 302
-@40 (226)
+$@40 (226)
     on left: 303, on right: 304
-@41 (227)
+$@41 (227)
     on left: 305, on right: 306
-@42 (228)
+$@42 (228)
     on left: 307, on right: 308
-@43 (229)
+$@43 (229)
     on left: 309, on right: 310
-@44 (230)
+$@44 (230)
     on left: 311, on right: 312
 symbols (231)
     on left: 313 314, on right: 9
@@ -938,48 +937,48 @@ key_list (233)
 symbolinclude (234)
     on left: 322 323, on right: 323 336
 symbolssect (235)
-    on left: 324 325 326 328 330 332 334 336 337 339 340,
-    on right: 313 314 322 323 325 326 328 330 332 334 336 337 339 340
-@45 (236)
+    on left: 324 325 326 328 330 332 334 336 337 339 340, on right:
+    313 314 322 323 325 326 328 330 332 334 336 337 339 340
+$@45 (236)
     on left: 327, on right: 328
-@46 (237)
+$@46 (237)
     on left: 329, on right: 330
-@47 (238)
+$@47 (238)
     on left: 331, on right: 332
-@48 (239)
+$@48 (239)
     on left: 333, on right: 334
-@49 (240)
+$@49 (240)
     on left: 335, on right: 336
-@50 (241)
+$@50 (241)
     on left: 338, on right: 339
 symbolname (242)
     on left: 341 342, on right: 319 321 344 346
 groupsyms (243)
     on left: 343 344 346, on right: 344 357 362
-@51 (244)
+$@51 (244)
     on left: 345, on right: 346
 actions (245)
     on left: 347 349, on right: 347 360 363
-@52 (246)
+$@52 (246)
     on left: 348, on right: 349
 keydescs (247)
     on left: 350 351, on right: 328 330 332 351
 keydesc (248)
-    on left: 352 353 354 357 360 361 362 363 364 365 366 367 368 369
-   , on right: 339 350 351
-@53 (249)
+    on left: 352 353 354 357 360 361 362 363 364 365 366 367 368 369,
+    on right: 339 350 351
+$@53 (249)
     on left: 355, on right: 357
-@54 (250)
+$@54 (250)
     on left: 356, on right: 357
-@55 (251)
+$@55 (251)
     on left: 358, on right: 360
-@56 (252)
+$@56 (252)
     on left: 359, on right: 360
 geometry (253)
     on left: 371 373, on right: 10
-@57 (254)
+$@57 (254)
     on left: 370, on right: 371
-@58 (255)
+$@58 (255)
     on left: 372, on right: 373
 
 
@@ -1004,7 +1003,7 @@ state 1
 
 state 2
 
-    4 xkbkeymap: '{' . keymap '}' @1 ';'
+    4 xkbkeymap: '{' . keymap '}' $@1 ';'
 
     $default  reduce using rule 5 (keymap)
 
@@ -1036,7 +1035,7 @@ state 5
 
 state 6
 
-    4 xkbkeymap: '{' keymap . '}' @1 ';'
+    4 xkbkeymap: '{' keymap . '}' $@1 ';'
     6 keymap: keymap . types
     7       | keymap . keycodes
     8       | keymap . compat
@@ -1094,11 +1093,11 @@ state 9
 
 state 10
 
-    4 xkbkeymap: '{' keymap '}' . @1 ';'
+    4 xkbkeymap: '{' keymap '}' . $@1 ';'
 
-    $default  reduce using rule 3 (@1)
+    $default  reduce using rule 3 ($@1)
 
-    @1  go to state 19
+    $@1  go to state 19
 
 
 state 11
@@ -1112,8 +1111,8 @@ state 11
    73       | flags . "xkb_compatibility" STR '{' compatsect '}' ';'
   313 symbols: flags . "xkb_symbols" '{' symbolssect '}' ';'
   314        | flags . "xkb_symbols" STR '{' symbolssect '}' ';'
-  371 geometry: flags . "xkb_geometry" '{' @57 '}' ';'
-  373         | flags . "xkb_geometry" STR '{' @58 '}' ';'
+  371 geometry: flags . "xkb_geometry" '{' $@57 '}' ';'
+  373         | flags . "xkb_geometry" STR '{' $@58 '}' ';'
 
     "xkb_keycodes"       shift, and go to state 20
     "xkb_compatibility"  shift, and go to state 21
@@ -1188,7 +1187,7 @@ state 18
 
 state 19
 
-    4 xkbkeymap: '{' keymap '}' @1 . ';'
+    4 xkbkeymap: '{' keymap '}' $@1 . ';'
 
     ';'  shift, and go to state 28
 
@@ -1213,8 +1212,8 @@ state 21
 
 state 22
 
-  371 geometry: flags "xkb_geometry" . '{' @57 '}' ';'
-  373         | flags "xkb_geometry" . STR '{' @58 '}' ';'
+  371 geometry: flags "xkb_geometry" . '{' $@57 '}' ';'
+  373         | flags "xkb_geometry" . STR '{' $@58 '}' ';'
 
     STR  shift, and go to state 33
     '{'  shift, and go to state 34
@@ -1261,7 +1260,7 @@ state 27
 
 state 28
 
-    4 xkbkeymap: '{' keymap '}' @1 ';' .
+    4 xkbkeymap: '{' keymap '}' $@1 ';' .
 
     $default  reduce using rule 4 (xkbkeymap)
 
@@ -1312,18 +1311,18 @@ state 32
 
 state 33
 
-  373 geometry: flags "xkb_geometry" STR . '{' @58 '}' ';'
+  373 geometry: flags "xkb_geometry" STR . '{' $@58 '}' ';'
 
     '{'  shift, and go to state 55
 
 
 state 34
 
-  371 geometry: flags "xkb_geometry" '{' . @57 '}' ';'
+  371 geometry: flags "xkb_geometry" '{' . $@57 '}' ';'
 
-    $default  reduce using rule 370 (@57)
+    $default  reduce using rule 370 ($@57)
 
-    @57  go to state 56
+    $@57  go to state 56
 
 
 state 35
@@ -1388,7 +1387,7 @@ state 40
 
 state 41
 
-   25 keycodesect: KEYCODE . '=' NUM ';' @2 keycodesect
+   25 keycodesect: KEYCODE . '=' NUM ';' $@2 keycodesect
 
     '='  shift, and go to state 62
 
@@ -1423,7 +1422,7 @@ state 45
 
 state 46
 
-   31 keycodesect: "alias" . KEYCODE '=' KEYCODE ';' @4 keycodesect
+   31 keycodesect: "alias" . KEYCODE '=' KEYCODE ';' $@4 keycodesect
 
     KEYCODE  shift, and go to state 67
 
@@ -1452,7 +1451,7 @@ state 49
 state 50
 
    13 include: "replace" .
-   27 keycodesect: "replace" . KEYCODE '=' NUM ';' @3 keycodesect
+   27 keycodesect: "replace" . KEYCODE '=' NUM ';' $@3 keycodesect
 
     KEYCODE  shift, and go to state 68
 
@@ -1461,7 +1460,7 @@ state 50
 
 state 51
 
-   33 keycodesect: include . STR @5 keycodesinclude keycodesect
+   33 keycodesect: include . STR $@5 keycodesinclude keycodesect
 
     STR  shift, and go to state 69
 
@@ -1486,14 +1485,14 @@ state 54
 
    72 compat: flags "xkb_compatibility" '{' compatsect . '}' ';'
   112 compatsect: compatsect . vmods_def
-  114           | compatsect . "interpret" '.' @10 interpret
-  116           | compatsect . "interpret" symbol @11 '{' interprets '}' ';'
-  118           | compatsect . "interpret" symbol '+' rmod @12 '{' interprets '}' ';'
-  120           | compatsect . "interpret" symbol '+' "any" @13 '{' interprets '}' ';'
-  122           | compatsect . "interpret" symbol '+' INTERPMATCH '(' mods ')' @14 '{' interprets '}' ';'
+  114           | compatsect . "interpret" '.' $@10 interpret
+  116           | compatsect . "interpret" symbol $@11 '{' interprets '}' ';'
+  118           | compatsect . "interpret" symbol '+' rmod $@12 '{' interprets '}' ';'
+  120           | compatsect . "interpret" symbol '+' "any" $@13 '{' interprets '}' ';'
+  122           | compatsect . "interpret" symbol '+' INTERPMATCH '(' mods ')' $@14 '{' interprets '}' ';'
   123           | compatsect . "group" NUM '=' mods ';'
   124           | compatsect . "indicator" STR '{' indicators '}' ';'
-  126           | compatsect . include STR @15 compatinclude
+  126           | compatsect . include STR $@15 compatinclude
   127           | compatsect . actiondef
   128           | compatsect . "indicator" '.' indicator
 
@@ -1528,16 +1527,16 @@ state 54
 
 state 55
 
-  373 geometry: flags "xkb_geometry" STR '{' . @58 '}' ';'
+  373 geometry: flags "xkb_geometry" STR '{' . $@58 '}' ';'
 
-    $default  reduce using rule 372 (@58)
+    $default  reduce using rule 372 ($@58)
 
-    @58  go to state 95
+    $@58  go to state 95
 
 
 state 56
 
-  371 geometry: flags "xkb_geometry" '{' @57 . '}' ';'
+  371 geometry: flags "xkb_geometry" '{' $@57 . '}' ';'
 
     '}'  shift, and go to state 96
 
@@ -1555,8 +1554,8 @@ state 58
 
    34 types: flags "xkb_types" '{' typessect . '}' ';'
    67 typessect: typessect . vmods_def
-   69          | typessect . "type" STR @8 '{' type '}' ';'
-   71          | typessect . include STR @9 typesinclude
+   69          | typessect . "type" STR $@8 '{' type '}' ';'
+   71          | typessect . include STR $@9 typesinclude
 
     "virtualmods"  shift, and go to state 73
     "type"         shift, and go to state 98
@@ -1584,13 +1583,13 @@ state 60
   313 symbols: flags "xkb_symbols" '{' symbolssect . '}' ';'
   325 symbolssect: symbolssect . vmods_def
   326            | symbolssect . "name" '[' group ']' '=' STR ';'
-  328            | symbolssect . "key" KEYCODE @45 '{' keydescs '}' ';'
-  330            | symbolssect . "replace" "key" KEYCODE @46 '{' keydescs '}' ';'
-  332            | symbolssect . "override" "key" KEYCODE @47 '{' keydescs '}' ';'
-  334            | symbolssect . "modifier_map" rmod @48 '{' key_list '}' ';'
-  336            | symbolssect . include STR @49 symbolinclude
+  328            | symbolssect . "key" KEYCODE $@45 '{' keydescs '}' ';'
+  330            | symbolssect . "replace" "key" KEYCODE $@46 '{' keydescs '}' ';'
+  332            | symbolssect . "override" "key" KEYCODE $@47 '{' keydescs '}' ';'
+  334            | symbolssect . "modifier_map" rmod $@48 '{' key_list '}' ';'
+  336            | symbolssect . include STR $@49 symbolinclude
   337            | symbolssect . actiondef
-  339            | symbolssect . "key" '.' @50 keydesc ';'
+  339            | symbolssect . "key" '.' $@50 keydesc ';'
   340            | symbolssect . error ';'
 
     error           shift, and go to state 103
@@ -1632,7 +1631,7 @@ state 61
 
 state 62
 
-   25 keycodesect: KEYCODE '=' . NUM ';' @2 keycodesect
+   25 keycodesect: KEYCODE '=' . NUM ';' $@2 keycodesect
 
     NUM  shift, and go to state 114
 
@@ -1667,25 +1666,25 @@ state 66
 
 state 67
 
-   31 keycodesect: "alias" KEYCODE . '=' KEYCODE ';' @4 keycodesect
+   31 keycodesect: "alias" KEYCODE . '=' KEYCODE ';' $@4 keycodesect
 
     '='  shift, and go to state 119
 
 
 state 68
 
-   27 keycodesect: "replace" KEYCODE . '=' NUM ';' @3 keycodesect
+   27 keycodesect: "replace" KEYCODE . '=' NUM ';' $@3 keycodesect
 
     '='  shift, and go to state 120
 
 
 state 69
 
-   33 keycodesect: include STR . @5 keycodesinclude keycodesect
+   33 keycodesect: include STR . $@5 keycodesinclude keycodesect
 
-    $default  reduce using rule 32 (@5)
+    $default  reduce using rule 32 ($@5)
 
-    @5  go to state 121
+    $@5  go to state 121
 
 
 state 70
@@ -1699,14 +1698,14 @@ state 71
 
    73 compat: flags "xkb_compatibility" STR '{' compatsect . '}' ';'
   112 compatsect: compatsect . vmods_def
-  114           | compatsect . "interpret" '.' @10 interpret
-  116           | compatsect . "interpret" symbol @11 '{' interprets '}' ';'
-  118           | compatsect . "interpret" symbol '+' rmod @12 '{' interprets '}' ';'
-  120           | compatsect . "interpret" symbol '+' "any" @13 '{' interprets '}' ';'
-  122           | compatsect . "interpret" symbol '+' INTERPMATCH '(' mods ')' @14 '{' interprets '}' ';'
+  114           | compatsect . "interpret" '.' $@10 interpret
+  116           | compatsect . "interpret" symbol $@11 '{' interprets '}' ';'
+  118           | compatsect . "interpret" symbol '+' rmod $@12 '{' interprets '}' ';'
+  120           | compatsect . "interpret" symbol '+' "any" $@13 '{' interprets '}' ';'
+  122           | compatsect . "interpret" symbol '+' INTERPMATCH '(' mods ')' $@14 '{' interprets '}' ';'
   123           | compatsect . "group" NUM '=' mods ';'
   124           | compatsect . "indicator" STR '{' indicators '}' ';'
-  126           | compatsect . include STR @15 compatinclude
+  126           | compatsect . include STR $@15 compatinclude
   127           | compatsect . actiondef
   128           | compatsect . "indicator" '.' indicator
 
@@ -1759,11 +1758,11 @@ state 73
 
 state 74
 
-  114 compatsect: compatsect "interpret" . '.' @10 interpret
-  116           | compatsect "interpret" . symbol @11 '{' interprets '}' ';'
-  118           | compatsect "interpret" . symbol '+' rmod @12 '{' interprets '}' ';'
-  120           | compatsect "interpret" . symbol '+' "any" @13 '{' interprets '}' ';'
-  122           | compatsect "interpret" . symbol '+' INTERPMATCH '(' mods ')' @14 '{' interprets '}' ';'
+  114 compatsect: compatsect "interpret" . '.' $@10 interpret
+  116           | compatsect "interpret" . symbol $@11 '{' interprets '}' ';'
+  118           | compatsect "interpret" . symbol '+' rmod $@12 '{' interprets '}' ';'
+  120           | compatsect "interpret" . symbol '+' "any" $@13 '{' interprets '}' ';'
+  122           | compatsect "interpret" . symbol '+' INTERPMATCH '(' mods ')' $@14 '{' interprets '}' ';'
 
     error       shift, and go to state 128
     IDENTIFIER  shift, and go to state 129
@@ -1775,21 +1774,21 @@ state 74
 
 state 75
 
-  286 actiondef: "setmods" . '.' @31 setmodsparam ';'
+  286 actiondef: "setmods" . '.' $@31 setmodsparam ';'
 
     '.'  shift, and go to state 133
 
 
 state 76
 
-  288 actiondef: "latchmods" . '.' @32 setmodsparam ';'
+  288 actiondef: "latchmods" . '.' $@32 setmodsparam ';'
 
     '.'  shift, and go to state 134
 
 
 state 77
 
-  290 actiondef: "lockmods" . '.' @33 setmodsparam ';'
+  290 actiondef: "lockmods" . '.' $@33 setmodsparam ';'
 
     '.'  shift, and go to state 135
 
@@ -1803,63 +1802,63 @@ state 78
 
 state 79
 
-  292 actiondef: "setgroup" . '.' @34 setgroupparam ';'
+  292 actiondef: "setgroup" . '.' $@34 setgroupparam ';'
 
     '.'  shift, and go to state 137
 
 
 state 80
 
-  294 actiondef: "latchgroup" . '.' @35 setgroupparam ';'
+  294 actiondef: "latchgroup" . '.' $@35 setgroupparam ';'
 
     '.'  shift, and go to state 138
 
 
 state 81
 
-  296 actiondef: "lockgroup" . '.' @36 setgroupparam ';'
+  296 actiondef: "lockgroup" . '.' $@36 setgroupparam ';'
 
     '.'  shift, and go to state 139
 
 
 state 82
 
-  298 actiondef: "moveptr" . '.' @37 moveptrparam ';'
+  298 actiondef: "moveptr" . '.' $@37 moveptrparam ';'
 
     '.'  shift, and go to state 140
 
 
 state 83
 
-  300 actiondef: "ptrbtn" . '.' @38 ptrbtnparam ';'
+  300 actiondef: "ptrbtn" . '.' $@38 ptrbtnparam ';'
 
     '.'  shift, and go to state 141
 
 
 state 84
 
-  304 actiondef: "setptrdflt" . '.' @40 ptrdfltparam ';'
+  304 actiondef: "setptrdflt" . '.' $@40 ptrdfltparam ';'
 
     '.'  shift, and go to state 142
 
 
 state 85
 
-  302 actiondef: "lockptrbtn" . '.' @39 ptrbtnparam ';'
+  302 actiondef: "lockptrbtn" . '.' $@39 ptrbtnparam ';'
 
     '.'  shift, and go to state 143
 
 
 state 86
 
-  306 actiondef: "setcontrols" . '.' @41 ctrlparams ';'
+  306 actiondef: "setcontrols" . '.' $@41 ctrlparams ';'
 
     '.'  shift, and go to state 144
 
 
 state 87
 
-  308 actiondef: "lockcontrols" . '.' @42 ctrlparams ';'
+  308 actiondef: "lockcontrols" . '.' $@42 ctrlparams ';'
 
     '.'  shift, and go to state 145
 
@@ -1873,14 +1872,14 @@ state 88
 
 state 89
 
-  310 actiondef: "isolock" . '.' @43 isolockparam ';'
+  310 actiondef: "isolock" . '.' $@43 isolockparam ';'
 
     '.'  shift, and go to state 146
 
 
 state 90
 
-  312 actiondef: "switchscreen" . '.' @44 switchscrnparam ';'
+  312 actiondef: "switchscreen" . '.' $@44 switchscrnparam ';'
 
     '.'  shift, and go to state 147
 
@@ -1894,7 +1893,7 @@ state 91
 
 state 92
 
-  126 compatsect: compatsect include . STR @15 compatinclude
+  126 compatsect: compatsect include . STR $@15 compatinclude
 
     STR  shift, and go to state 149
 
@@ -1915,14 +1914,14 @@ state 94
 
 state 95
 
-  373 geometry: flags "xkb_geometry" STR '{' @58 . '}' ';'
+  373 geometry: flags "xkb_geometry" STR '{' $@58 . '}' ';'
 
     '}'  shift, and go to state 150
 
 
 state 96
 
-  371 geometry: flags "xkb_geometry" '{' @57 '}' . ';'
+  371 geometry: flags "xkb_geometry" '{' $@57 '}' . ';'
 
     ';'  shift, and go to state 151
 
@@ -1931,8 +1930,8 @@ state 97
 
    35 types: flags "xkb_types" STR '{' typessect . '}' ';'
    67 typessect: typessect . vmods_def
-   69          | typessect . "type" STR @8 '{' type '}' ';'
-   71          | typessect . include STR @9 typesinclude
+   69          | typessect . "type" STR $@8 '{' type '}' ';'
+   71          | typessect . include STR $@9 typesinclude
 
     "virtualmods"  shift, and go to state 73
     "type"         shift, and go to state 98
@@ -1948,7 +1947,7 @@ state 97
 
 state 98
 
-   69 typessect: typessect "type" . STR @8 '{' type '}' ';'
+   69 typessect: typessect "type" . STR $@8 '{' type '}' ';'
 
     STR  shift, and go to state 153
 
@@ -1962,7 +1961,7 @@ state 99
 
 state 100
 
-   71 typessect: typessect include . STR @9 typesinclude
+   71 typessect: typessect include . STR $@9 typesinclude
 
     STR  shift, and go to state 155
 
@@ -1979,13 +1978,13 @@ state 102
   314 symbols: flags "xkb_symbols" STR '{' symbolssect . '}' ';'
   325 symbolssect: symbolssect . vmods_def
   326            | symbolssect . "name" '[' group ']' '=' STR ';'
-  328            | symbolssect . "key" KEYCODE @45 '{' keydescs '}' ';'
-  330            | symbolssect . "replace" "key" KEYCODE @46 '{' keydescs '}' ';'
-  332            | symbolssect . "override" "key" KEYCODE @47 '{' keydescs '}' ';'
-  334            | symbolssect . "modifier_map" rmod @48 '{' key_list '}' ';'
-  336            | symbolssect . include STR @49 symbolinclude
+  328            | symbolssect . "key" KEYCODE $@45 '{' keydescs '}' ';'
+  330            | symbolssect . "replace" "key" KEYCODE $@46 '{' keydescs '}' ';'
+  332            | symbolssect . "override" "key" KEYCODE $@47 '{' keydescs '}' ';'
+  334            | symbolssect . "modifier_map" rmod $@48 '{' key_list '}' ';'
+  336            | symbolssect . include STR $@49 symbolinclude
   337            | symbolssect . actiondef
-  339            | symbolssect . "key" '.' @50 keydesc ';'
+  339            | symbolssect . "key" '.' $@50 keydesc ';'
   340            | symbolssect . error ';'
 
     error           shift, and go to state 103
@@ -2034,8 +2033,8 @@ state 104
 
 state 105
 
-  328 symbolssect: symbolssect "key" . KEYCODE @45 '{' keydescs '}' ';'
-  339            | symbolssect "key" . '.' @50 keydesc ';'
+  328 symbolssect: symbolssect "key" . KEYCODE $@45 '{' keydescs '}' ';'
+  339            | symbolssect "key" . '.' $@50 keydesc ';'
 
     KEYCODE  shift, and go to state 159
     '.'      shift, and go to state 160
@@ -2043,7 +2042,7 @@ state 105
 
 state 106
 
-  334 symbolssect: symbolssect "modifier_map" . rmod @48 '{' key_list '}' ';'
+  334 symbolssect: symbolssect "modifier_map" . rmod $@48 '{' key_list '}' ';'
 
     "shift"    shift, and go to state 161
     "lock"     shift, and go to state 162
@@ -2060,7 +2059,7 @@ state 106
 state 107
 
    14 include: "override" .
-  332 symbolssect: symbolssect "override" . "key" KEYCODE @47 '{' keydescs '}' ';'
+  332 symbolssect: symbolssect "override" . "key" KEYCODE $@47 '{' keydescs '}' ';'
 
     "key"  shift, and go to state 170
 
@@ -2070,7 +2069,7 @@ state 107
 state 108
 
    13 include: "replace" .
-  330 symbolssect: symbolssect "replace" . "key" KEYCODE @46 '{' keydescs '}' ';'
+  330 symbolssect: symbolssect "replace" . "key" KEYCODE $@46 '{' keydescs '}' ';'
 
     "key"  shift, and go to state 171
 
@@ -2086,7 +2085,7 @@ state 109
 
 state 110
 
-  336 symbolssect: symbolssect include . STR @49 symbolinclude
+  336 symbolssect: symbolssect include . STR $@49 symbolinclude
 
     STR  shift, and go to state 173
 
@@ -2114,7 +2113,7 @@ state 113
 
 state 114
 
-   25 keycodesect: KEYCODE '=' NUM . ';' @2 keycodesect
+   25 keycodesect: KEYCODE '=' NUM . ';' $@2 keycodesect
 
     ';'  shift, and go to state 175
 
@@ -2149,21 +2148,21 @@ state 118
 
 state 119
 
-   31 keycodesect: "alias" KEYCODE '=' . KEYCODE ';' @4 keycodesect
+   31 keycodesect: "alias" KEYCODE '=' . KEYCODE ';' $@4 keycodesect
 
     KEYCODE  shift, and go to state 180
 
 
 state 120
 
-   27 keycodesect: "replace" KEYCODE '=' . NUM ';' @3 keycodesect
+   27 keycodesect: "replace" KEYCODE '=' . NUM ';' $@3 keycodesect
 
     NUM  shift, and go to state 181
 
 
 state 121
 
-   33 keycodesect: include STR @5 . keycodesinclude keycodesect
+   33 keycodesect: include STR $@5 . keycodesinclude keycodesect
 
     '{'  shift, and go to state 182
 
@@ -2250,52 +2249,52 @@ state 130
 
 state 131
 
-  114 compatsect: compatsect "interpret" '.' . @10 interpret
+  114 compatsect: compatsect "interpret" '.' . $@10 interpret
 
-    $default  reduce using rule 113 (@10)
+    $default  reduce using rule 113 ($@10)
 
-    @10  go to state 201
+    $@10  go to state 201
 
 
 state 132
 
-  116 compatsect: compatsect "interpret" symbol . @11 '{' interprets '}' ';'
-  118           | compatsect "interpret" symbol . '+' rmod @12 '{' interprets '}' ';'
-  120           | compatsect "interpret" symbol . '+' "any" @13 '{' interprets '}' ';'
-  122           | compatsect "interpret" symbol . '+' INTERPMATCH '(' mods ')' @14 '{' interprets '}' ';'
+  116 compatsect: compatsect "interpret" symbol . $@11 '{' interprets '}' ';'
+  118           | compatsect "interpret" symbol . '+' rmod $@12 '{' interprets '}' ';'
+  120           | compatsect "interpret" symbol . '+' "any" $@13 '{' interprets '}' ';'
+  122           | compatsect "interpret" symbol . '+' INTERPMATCH '(' mods ')' $@14 '{' interprets '}' ';'
 
     '+'  shift, and go to state 202
 
-    $default  reduce using rule 115 (@11)
+    $default  reduce using rule 115 ($@11)
 
-    @11  go to state 203
+    $@11  go to state 203
 
 
 state 133
 
-  286 actiondef: "setmods" '.' . @31 setmodsparam ';'
+  286 actiondef: "setmods" '.' . $@31 setmodsparam ';'
 
-    $default  reduce using rule 285 (@31)
+    $default  reduce using rule 285 ($@31)
 
-    @31  go to state 204
+    $@31  go to state 204
 
 
 state 134
 
-  288 actiondef: "latchmods" '.' . @32 setmodsparam ';'
+  288 actiondef: "latchmods" '.' . $@32 setmodsparam ';'
 
-    $default  reduce using rule 287 (@32)
+    $default  reduce using rule 287 ($@32)
 
-    @32  go to state 205
+    $@32  go to state 205
 
 
 state 135
 
-  290 actiondef: "lockmods" '.' . @33 setmodsparam ';'
+  290 actiondef: "lockmods" '.' . $@33 setmodsparam ';'
 
-    $default  reduce using rule 289 (@33)
+    $default  reduce using rule 289 ($@33)
 
-    @33  go to state 206
+    $@33  go to state 206
 
 
 state 136
@@ -2307,101 +2306,101 @@ state 136
 
 state 137
 
-  292 actiondef: "setgroup" '.' . @34 setgroupparam ';'
+  292 actiondef: "setgroup" '.' . $@34 setgroupparam ';'
 
-    $default  reduce using rule 291 (@34)
+    $default  reduce using rule 291 ($@34)
 
-    @34  go to state 208
+    $@34  go to state 208
 
 
 state 138
 
-  294 actiondef: "latchgroup" '.' . @35 setgroupparam ';'
+  294 actiondef: "latchgroup" '.' . $@35 setgroupparam ';'
 
-    $default  reduce using rule 293 (@35)
+    $default  reduce using rule 293 ($@35)
 
-    @35  go to state 209
+    $@35  go to state 209
 
 
 state 139
 
-  296 actiondef: "lockgroup" '.' . @36 setgroupparam ';'
+  296 actiondef: "lockgroup" '.' . $@36 setgroupparam ';'
 
-    $default  reduce using rule 295 (@36)
+    $default  reduce using rule 295 ($@36)
 
-    @36  go to state 210
+    $@36  go to state 210
 
 
 state 140
 
-  298 actiondef: "moveptr" '.' . @37 moveptrparam ';'
+  298 actiondef: "moveptr" '.' . $@37 moveptrparam ';'
 
-    $default  reduce using rule 297 (@37)
+    $default  reduce using rule 297 ($@37)
 
-    @37  go to state 211
+    $@37  go to state 211
 
 
 state 141
 
-  300 actiondef: "ptrbtn" '.' . @38 ptrbtnparam ';'
+  300 actiondef: "ptrbtn" '.' . $@38 ptrbtnparam ';'
 
-    $default  reduce using rule 299 (@38)
+    $default  reduce using rule 299 ($@38)
 
-    @38  go to state 212
+    $@38  go to state 212
 
 
 state 142
 
-  304 actiondef: "setptrdflt" '.' . @40 ptrdfltparam ';'
+  304 actiondef: "setptrdflt" '.' . $@40 ptrdfltparam ';'
 
-    $default  reduce using rule 303 (@40)
+    $default  reduce using rule 303 ($@40)
 
-    @40  go to state 213
+    $@40  go to state 213
 
 
 state 143
 
-  302 actiondef: "lockptrbtn" '.' . @39 ptrbtnparam ';'
+  302 actiondef: "lockptrbtn" '.' . $@39 ptrbtnparam ';'
 
-    $default  reduce using rule 301 (@39)
+    $default  reduce using rule 301 ($@39)
 
-    @39  go to state 214
+    $@39  go to state 214
 
 
 state 144
 
-  306 actiondef: "setcontrols" '.' . @41 ctrlparams ';'
+  306 actiondef: "setcontrols" '.' . $@41 ctrlparams ';'
 
-    $default  reduce using rule 305 (@41)
+    $default  reduce using rule 305 ($@41)
 
-    @41  go to state 215
+    $@41  go to state 215
 
 
 state 145
 
-  308 actiondef: "lockcontrols" '.' . @42 ctrlparams ';'
+  308 actiondef: "lockcontrols" '.' . $@42 ctrlparams ';'
 
-    $default  reduce using rule 307 (@42)
+    $default  reduce using rule 307 ($@42)
 
-    @42  go to state 216
+    $@42  go to state 216
 
 
 state 146
 
-  310 actiondef: "isolock" '.' . @43 isolockparam ';'
+  310 actiondef: "isolock" '.' . $@43 isolockparam ';'
 
-    $default  reduce using rule 309 (@43)
+    $default  reduce using rule 309 ($@43)
 
-    @43  go to state 217
+    $@43  go to state 217
 
 
 state 147
 
-  312 actiondef: "switchscreen" '.' . @44 switchscrnparam ';'
+  312 actiondef: "switchscreen" '.' . $@44 switchscrnparam ';'
 
-    $default  reduce using rule 311 (@44)
+    $default  reduce using rule 311 ($@44)
 
-    @44  go to state 218
+    $@44  go to state 218
 
 
 state 148
@@ -2413,23 +2412,23 @@ state 148
 
 state 149
 
-  126 compatsect: compatsect include STR . @15 compatinclude
+  126 compatsect: compatsect include STR . $@15 compatinclude
 
-    $default  reduce using rule 125 (@15)
+    $default  reduce using rule 125 ($@15)
 
-    @15  go to state 219
+    $@15  go to state 219
 
 
 state 150
 
-  373 geometry: flags "xkb_geometry" STR '{' @58 '}' . ';'
+  373 geometry: flags "xkb_geometry" STR '{' $@58 '}' . ';'
 
     ';'  shift, and go to state 220
 
 
 state 151
 
-  371 geometry: flags "xkb_geometry" '{' @57 '}' ';' .
+  371 geometry: flags "xkb_geometry" '{' $@57 '}' ';' .
 
     $default  reduce using rule 371 (geometry)
 
@@ -2443,11 +2442,11 @@ state 152
 
 state 153
 
-   69 typessect: typessect "type" STR . @8 '{' type '}' ';'
+   69 typessect: typessect "type" STR . $@8 '{' type '}' ';'
 
-    $default  reduce using rule 68 (@8)
+    $default  reduce using rule 68 ($@8)
 
-    @8  go to state 222
+    $@8  go to state 222
 
 
 state 154
@@ -2459,11 +2458,11 @@ state 154
 
 state 155
 
-   71 typessect: typessect include STR . @9 typesinclude
+   71 typessect: typessect include STR . $@9 typesinclude
 
-    $default  reduce using rule 70 (@9)
+    $default  reduce using rule 70 ($@9)
 
-    @9  go to state 223
+    $@9  go to state 223
 
 
 state 156
@@ -2493,20 +2492,20 @@ state 158
 
 state 159
 
-  328 symbolssect: symbolssect "key" KEYCODE . @45 '{' keydescs '}' ';'
+  328 symbolssect: symbolssect "key" KEYCODE . $@45 '{' keydescs '}' ';'
 
-    $default  reduce using rule 327 (@45)
+    $default  reduce using rule 327 ($@45)
 
-    @45  go to state 229
+    $@45  go to state 229
 
 
 state 160
 
-  339 symbolssect: symbolssect "key" '.' . @50 keydesc ';'
+  339 symbolssect: symbolssect "key" '.' . $@50 keydesc ';'
 
-    $default  reduce using rule 338 (@50)
+    $default  reduce using rule 338 ($@50)
 
-    @50  go to state 230
+    $@50  go to state 230
 
 
 state 161
@@ -2567,23 +2566,23 @@ state 168
 
 state 169
 
-  334 symbolssect: symbolssect "modifier_map" rmod . @48 '{' key_list '}' ';'
+  334 symbolssect: symbolssect "modifier_map" rmod . $@48 '{' key_list '}' ';'
 
-    $default  reduce using rule 333 (@48)
+    $default  reduce using rule 333 ($@48)
 
-    @48  go to state 231
+    $@48  go to state 231
 
 
 state 170
 
-  332 symbolssect: symbolssect "override" "key" . KEYCODE @47 '{' keydescs '}' ';'
+  332 symbolssect: symbolssect "override" "key" . KEYCODE $@47 '{' keydescs '}' ';'
 
     KEYCODE  shift, and go to state 232
 
 
 state 171
 
-  330 symbolssect: symbolssect "replace" "key" . KEYCODE @46 '{' keydescs '}' ';'
+  330 symbolssect: symbolssect "replace" "key" . KEYCODE $@46 '{' keydescs '}' ';'
 
     KEYCODE  shift, and go to state 233
 
@@ -2597,11 +2596,11 @@ state 172
 
 state 173
 
-  336 symbolssect: symbolssect include STR . @49 symbolinclude
+  336 symbolssect: symbolssect include STR . $@49 symbolinclude
 
-    $default  reduce using rule 335 (@49)
+    $default  reduce using rule 335 ($@49)
 
-    @49  go to state 234
+    $@49  go to state 234
 
 
 state 174
@@ -2613,11 +2612,11 @@ state 174
 
 state 175
 
-   25 keycodesect: KEYCODE '=' NUM ';' . @2 keycodesect
+   25 keycodesect: KEYCODE '=' NUM ';' . $@2 keycodesect
 
-    $default  reduce using rule 24 (@2)
+    $default  reduce using rule 24 ($@2)
 
-    @2  go to state 235
+    $@2  go to state 235
 
 
 state 176
@@ -2678,14 +2677,14 @@ state 179
 
 state 180
 
-   31 keycodesect: "alias" KEYCODE '=' KEYCODE . ';' @4 keycodesect
+   31 keycodesect: "alias" KEYCODE '=' KEYCODE . ';' $@4 keycodesect
 
     ';'  shift, and go to state 240
 
 
 state 181
 
-   27 keycodesect: "replace" KEYCODE '=' NUM . ';' @3 keycodesect
+   27 keycodesect: "replace" KEYCODE '=' NUM . ';' $@3 keycodesect
 
     ';'  shift, and go to state 241
 
@@ -2714,7 +2713,7 @@ state 182
 state 183
 
    20 keycodesinclude: keycodesinclude . '{' keycodesect '}'
-   33 keycodesect: include STR @5 keycodesinclude . keycodesect
+   33 keycodesect: include STR $@5 keycodesinclude . keycodesect
 
     KEYCODE      shift, and go to state 41
     "minimum"    shift, and go to state 42
@@ -2867,7 +2866,7 @@ state 200
 
 state 201
 
-  114 compatsect: compatsect "interpret" '.' @10 . interpret
+  114 compatsect: compatsect "interpret" '.' $@10 . interpret
 
     "usemodmap"   shift, and go to state 261
     "repeat"      shift, and go to state 262
@@ -2884,9 +2883,9 @@ state 201
 
 state 202
 
-  118 compatsect: compatsect "interpret" symbol '+' . rmod @12 '{' interprets '}' ';'
-  120           | compatsect "interpret" symbol '+' . "any" @13 '{' interprets '}' ';'
-  122           | compatsect "interpret" symbol '+' . INTERPMATCH '(' mods ')' @14 '{' interprets '}' ';'
+  118 compatsect: compatsect "interpret" symbol '+' . rmod $@12 '{' interprets '}' ';'
+  120           | compatsect "interpret" symbol '+' . "any" $@13 '{' interprets '}' ';'
+  122           | compatsect "interpret" symbol '+' . INTERPMATCH '(' mods ')' $@14 '{' interprets '}' ';'
 
     INTERPMATCH  shift, and go to state 271
     "any"        shift, and go to state 272
@@ -2904,14 +2903,14 @@ state 202
 
 state 203
 
-  116 compatsect: compatsect "interpret" symbol @11 . '{' interprets '}' ';'
+  116 compatsect: compatsect "interpret" symbol $@11 . '{' interprets '}' ';'
 
     '{'  shift, and go to state 274
 
 
 state 204
 
-  286 actiondef: "setmods" '.' @31 . setmodsparam ';'
+  286 actiondef: "setmods" '.' $@31 . setmodsparam ';'
 
     "usemodmap"    shift, and go to state 275
     "clearlocks"   shift, and go to state 276
@@ -2928,7 +2927,7 @@ state 204
 
 state 205
 
-  288 actiondef: "latchmods" '.' @32 . setmodsparam ';'
+  288 actiondef: "latchmods" '.' $@32 . setmodsparam ';'
 
     "usemodmap"    shift, and go to state 275
     "clearlocks"   shift, and go to state 276
@@ -2945,7 +2944,7 @@ state 205
 
 state 206
 
-  290 actiondef: "lockmods" '.' @33 . setmodsparam ';'
+  290 actiondef: "lockmods" '.' $@33 . setmodsparam ';'
 
     "usemodmap"    shift, and go to state 275
     "clearlocks"   shift, and go to state 276
@@ -2977,7 +2976,7 @@ state 207
 
 state 208
 
-  292 actiondef: "setgroup" '.' @34 . setgroupparam ';'
+  292 actiondef: "setgroup" '.' $@34 . setgroupparam ';'
 
     "clearlocks"   shift, and go to state 276
     "latchtolock"  shift, and go to state 278
@@ -2992,7 +2991,7 @@ state 208
 
 state 209
 
-  294 actiondef: "latchgroup" '.' @35 . setgroupparam ';'
+  294 actiondef: "latchgroup" '.' $@35 . setgroupparam ';'
 
     "clearlocks"   shift, and go to state 276
     "latchtolock"  shift, and go to state 278
@@ -3007,7 +3006,7 @@ state 209
 
 state 210
 
-  296 actiondef: "lockgroup" '.' @36 . setgroupparam ';'
+  296 actiondef: "lockgroup" '.' $@36 . setgroupparam ';'
 
     "clearlocks"   shift, and go to state 276
     "latchtolock"  shift, and go to state 278
@@ -3022,7 +3021,7 @@ state 210
 
 state 211
 
-  298 actiondef: "moveptr" '.' @37 . moveptrparam ';'
+  298 actiondef: "moveptr" '.' $@37 . moveptrparam ';'
 
     IDENTIFIER  shift, and go to state 300
     "accel"     shift, and go to state 301
@@ -3035,7 +3034,7 @@ state 211
 
 state 212
 
-  300 actiondef: "ptrbtn" '.' @38 . ptrbtnparam ';'
+  300 actiondef: "ptrbtn" '.' $@38 . ptrbtnparam ';'
 
     "button"  shift, and go to state 306
     "count"   shift, and go to state 307
@@ -3046,7 +3045,7 @@ state 212
 
 state 213
 
-  304 actiondef: "setptrdflt" '.' @40 . ptrdfltparam ';'
+  304 actiondef: "setptrdflt" '.' $@40 . ptrdfltparam ';'
 
     "button"  shift, and go to state 310
     "affect"  shift, and go to state 311
@@ -3056,7 +3055,7 @@ state 213
 
 state 214
 
-  302 actiondef: "lockptrbtn" '.' @39 . ptrbtnparam ';'
+  302 actiondef: "lockptrbtn" '.' $@39 . ptrbtnparam ';'
 
     "button"  shift, and go to state 306
     "count"   shift, and go to state 307
@@ -3067,7 +3066,7 @@ state 214
 
 state 215
 
-  306 actiondef: "setcontrols" '.' @41 . ctrlparams ';'
+  306 actiondef: "setcontrols" '.' $@41 . ctrlparams ';'
 
     "controls"  shift, and go to state 314
 
@@ -3076,7 +3075,7 @@ state 215
 
 state 216
 
-  308 actiondef: "lockcontrols" '.' @42 . ctrlparams ';'
+  308 actiondef: "lockcontrols" '.' $@42 . ctrlparams ';'
 
     "controls"  shift, and go to state 314
 
@@ -3085,7 +3084,7 @@ state 216
 
 state 217
 
-  310 actiondef: "isolock" '.' @43 . isolockparam ';'
+  310 actiondef: "isolock" '.' $@43 . isolockparam ';'
 
     "mods"      shift, and go to state 317
     "group"     shift, and go to state 318
@@ -3097,7 +3096,7 @@ state 217
 
 state 218
 
-  312 actiondef: "switchscreen" '.' @44 . switchscrnparam ';'
+  312 actiondef: "switchscreen" '.' $@44 . switchscrnparam ';'
 
     "sameserver"  shift, and go to state 322
     "screen"      shift, and go to state 323
@@ -3110,7 +3109,7 @@ state 218
 
 state 219
 
-  126 compatsect: compatsect include STR @15 . compatinclude
+  126 compatsect: compatsect include STR $@15 . compatinclude
 
     '{'  shift, and go to state 328
 
@@ -3119,7 +3118,7 @@ state 219
 
 state 220
 
-  373 geometry: flags "xkb_geometry" STR '{' @58 '}' ';' .
+  373 geometry: flags "xkb_geometry" STR '{' $@58 '}' ';' .
 
     $default  reduce using rule 373 (geometry)
 
@@ -3133,14 +3132,14 @@ state 221
 
 state 222
 
-   69 typessect: typessect "type" STR @8 . '{' type '}' ';'
+   69 typessect: typessect "type" STR $@8 . '{' type '}' ';'
 
     '{'  shift, and go to state 330
 
 
 state 223
 
-   71 typessect: typessect include STR @9 . typesinclude
+   71 typessect: typessect include STR $@9 . typesinclude
 
     '{'  shift, and go to state 331
 
@@ -3184,14 +3183,14 @@ state 228
 
 state 229
 
-  328 symbolssect: symbolssect "key" KEYCODE @45 . '{' keydescs '}' ';'
+  328 symbolssect: symbolssect "key" KEYCODE $@45 . '{' keydescs '}' ';'
 
     '{'  shift, and go to state 334
 
 
 state 230
 
-  339 symbolssect: symbolssect "key" '.' @50 . keydesc ';'
+  339 symbolssect: symbolssect "key" '.' $@50 . keydesc ';'
 
     "virtualmods"     shift, and go to state 335
     "type"            shift, and go to state 336
@@ -3205,46 +3204,46 @@ state 230
     '~'               shift, and go to state 342
     '!'               shift, and go to state 343
 
-    "actions"  reduce using rule 358 (@55)
-    $default   reduce using rule 355 (@53)
+    "actions"  reduce using rule 358 ($@55)
+    $default   reduce using rule 355 ($@53)
 
     locking      go to state 344
     repeat       go to state 345
     groupswrap   go to state 346
     groupsclamp  go to state 347
     keydesc      go to state 348
-    @53          go to state 349
-    @55          go to state 350
+    $@53         go to state 349
+    $@55         go to state 350
 
 
 state 231
 
-  334 symbolssect: symbolssect "modifier_map" rmod @48 . '{' key_list '}' ';'
+  334 symbolssect: symbolssect "modifier_map" rmod $@48 . '{' key_list '}' ';'
 
     '{'  shift, and go to state 351
 
 
 state 232
 
-  332 symbolssect: symbolssect "override" "key" KEYCODE . @47 '{' keydescs '}' ';'
+  332 symbolssect: symbolssect "override" "key" KEYCODE . $@47 '{' keydescs '}' ';'
 
-    $default  reduce using rule 331 (@47)
+    $default  reduce using rule 331 ($@47)
 
-    @47  go to state 352
+    $@47  go to state 352
 
 
 state 233
 
-  330 symbolssect: symbolssect "replace" "key" KEYCODE . @46 '{' keydescs '}' ';'
+  330 symbolssect: symbolssect "replace" "key" KEYCODE . $@46 '{' keydescs '}' ';'
 
-    $default  reduce using rule 329 (@46)
+    $default  reduce using rule 329 ($@46)
 
-    @46  go to state 353
+    $@46  go to state 353
 
 
 state 234
 
-  336 symbolssect: symbolssect include STR @49 . symbolinclude
+  336 symbolssect: symbolssect include STR $@49 . symbolinclude
 
     '{'  shift, and go to state 354
 
@@ -3253,7 +3252,7 @@ state 234
 
 state 235
 
-   25 keycodesect: KEYCODE '=' NUM ';' @2 . keycodesect
+   25 keycodesect: KEYCODE '=' NUM ';' $@2 . keycodesect
 
     KEYCODE      shift, and go to state 41
     "minimum"    shift, and go to state 42
@@ -3316,20 +3315,20 @@ state 239
 
 state 240
 
-   31 keycodesect: "alias" KEYCODE '=' KEYCODE ';' . @4 keycodesect
+   31 keycodesect: "alias" KEYCODE '=' KEYCODE ';' . $@4 keycodesect
 
-    $default  reduce using rule 30 (@4)
+    $default  reduce using rule 30 ($@4)
 
-    @4  go to state 359
+    $@4  go to state 359
 
 
 state 241
 
-   27 keycodesect: "replace" KEYCODE '=' NUM ';' . @3 keycodesect
+   27 keycodesect: "replace" KEYCODE '=' NUM ';' . $@3 keycodesect
 
-    $default  reduce using rule 26 (@3)
+    $default  reduce using rule 26 ($@3)
 
-    @3  go to state 360
+    $@3  go to state 360
 
 
 state 242
@@ -3362,7 +3361,7 @@ state 243
 
 state 244
 
-   33 keycodesect: include STR @5 keycodesinclude keycodesect .
+   33 keycodesect: include STR $@5 keycodesinclude keycodesect .
 
     $default  reduce using rule 33 (keycodesect)
 
@@ -3580,7 +3579,7 @@ state 267
 
 state 268
 
-  114 compatsect: compatsect "interpret" '.' @10 interpret .
+  114 compatsect: compatsect "interpret" '.' $@10 interpret .
 
     $default  reduce using rule 114 (compatsect)
 
@@ -3601,32 +3600,32 @@ state 270
 
 state 271
 
-  122 compatsect: compatsect "interpret" symbol '+' INTERPMATCH . '(' mods ')' @14 '{' interprets '}' ';'
+  122 compatsect: compatsect "interpret" symbol '+' INTERPMATCH . '(' mods ')' $@14 '{' interprets '}' ';'
 
     '('  shift, and go to state 391
 
 
 state 272
 
-  120 compatsect: compatsect "interpret" symbol '+' "any" . @13 '{' interprets '}' ';'
+  120 compatsect: compatsect "interpret" symbol '+' "any" . $@13 '{' interprets '}' ';'
 
-    $default  reduce using rule 119 (@13)
+    $default  reduce using rule 119 ($@13)
 
-    @13  go to state 392
+    $@13  go to state 392
 
 
 state 273
 
-  118 compatsect: compatsect "interpret" symbol '+' rmod . @12 '{' interprets '}' ';'
+  118 compatsect: compatsect "interpret" symbol '+' rmod . $@12 '{' interprets '}' ';'
 
-    $default  reduce using rule 117 (@12)
+    $default  reduce using rule 117 ($@12)
 
-    @12  go to state 393
+    $@12  go to state 393
 
 
 state 274
 
-  116 compatsect: compatsect "interpret" symbol @11 '{' . interprets '}' ';'
+  116 compatsect: compatsect "interpret" symbol $@11 '{' . interprets '}' ';'
 
     $default  reduce using rule 102 (interprets)
 
@@ -3716,21 +3715,21 @@ state 283
 
 state 284
 
-  286 actiondef: "setmods" '.' @31 setmodsparam . ';'
+  286 actiondef: "setmods" '.' $@31 setmodsparam . ';'
 
     ';'  shift, and go to state 405
 
 
 state 285
 
-  288 actiondef: "latchmods" '.' @32 setmodsparam . ';'
+  288 actiondef: "latchmods" '.' $@32 setmodsparam . ';'
 
     ';'  shift, and go to state 406
 
 
 state 286
 
-  290 actiondef: "lockmods" '.' @33 setmodsparam . ';'
+  290 actiondef: "lockmods" '.' $@33 setmodsparam . ';'
 
     ';'  shift, and go to state 407
 
@@ -3827,21 +3826,21 @@ state 296
 
 state 297
 
-  292 actiondef: "setgroup" '.' @34 setgroupparam . ';'
+  292 actiondef: "setgroup" '.' $@34 setgroupparam . ';'
 
     ';'  shift, and go to state 414
 
 
 state 298
 
-  294 actiondef: "latchgroup" '.' @35 setgroupparam . ';'
+  294 actiondef: "latchgroup" '.' $@35 setgroupparam . ';'
 
     ';'  shift, and go to state 415
 
 
 state 299
 
-  296 actiondef: "lockgroup" '.' @36 setgroupparam . ';'
+  296 actiondef: "lockgroup" '.' $@36 setgroupparam . ';'
 
     ';'  shift, and go to state 416
 
@@ -3888,7 +3887,7 @@ state 304
 
 state 305
 
-  298 actiondef: "moveptr" '.' @37 moveptrparam . ';'
+  298 actiondef: "moveptr" '.' $@37 moveptrparam . ';'
 
     ';'  shift, and go to state 421
 
@@ -3916,7 +3915,7 @@ state 308
 
 state 309
 
-  300 actiondef: "ptrbtn" '.' @38 ptrbtnparam . ';'
+  300 actiondef: "ptrbtn" '.' $@38 ptrbtnparam . ';'
 
     ';'  shift, and go to state 425
 
@@ -3939,14 +3938,14 @@ state 311
 
 state 312
 
-  304 actiondef: "setptrdflt" '.' @40 ptrdfltparam . ';'
+  304 actiondef: "setptrdflt" '.' $@40 ptrdfltparam . ';'
 
     ';'  shift, and go to state 428
 
 
 state 313
 
-  302 actiondef: "lockptrbtn" '.' @39 ptrbtnparam . ';'
+  302 actiondef: "lockptrbtn" '.' $@39 ptrbtnparam . ';'
 
     ';'  shift, and go to state 429
 
@@ -3960,14 +3959,14 @@ state 314
 
 state 315
 
-  306 actiondef: "setcontrols" '.' @41 ctrlparams . ';'
+  306 actiondef: "setcontrols" '.' $@41 ctrlparams . ';'
 
     ';'  shift, and go to state 431
 
 
 state 316
 
-  308 actiondef: "lockcontrols" '.' @42 ctrlparams . ';'
+  308 actiondef: "lockcontrols" '.' $@42 ctrlparams . ';'
 
     ';'  shift, and go to state 432
 
@@ -4003,7 +4002,7 @@ state 320
 
 state 321
 
-  310 actiondef: "isolock" '.' @43 isolockparam . ';'
+  310 actiondef: "isolock" '.' $@43 isolockparam . ';'
 
     ';'  shift, and go to state 437
 
@@ -4052,7 +4051,7 @@ state 326
 
 state 327
 
-  312 actiondef: "switchscreen" '.' @44 switchscrnparam . ';'
+  312 actiondef: "switchscreen" '.' $@44 switchscrnparam . ';'
 
     ';'  shift, and go to state 444
 
@@ -4069,7 +4068,7 @@ state 328
 state 329
 
   110 compatinclude: compatinclude . '{' compatsect '}'
-  126 compatsect: compatsect include STR @15 compatinclude .
+  126 compatsect: compatsect include STR $@15 compatinclude .
 
     '{'  shift, and go to state 446
 
@@ -4078,7 +4077,7 @@ state 329
 
 state 330
 
-   69 typessect: typessect "type" STR @8 '{' . type '}' ';'
+   69 typessect: typessect "type" STR $@8 '{' . type '}' ';'
 
     $default  reduce using rule 59 (type)
 
@@ -4097,7 +4096,7 @@ state 331
 state 332
 
    65 typesinclude: typesinclude . '{' typessect '}'
-   71 typessect: typessect include STR @9 typesinclude .
+   71 typessect: typessect include STR $@9 typesinclude .
 
     '{'  shift, and go to state 449
 
@@ -4113,7 +4112,7 @@ state 333
 
 state 334
 
-  328 symbolssect: symbolssect "key" KEYCODE @45 '{' . keydescs '}' ';'
+  328 symbolssect: symbolssect "key" KEYCODE $@45 '{' . keydescs '}' ';'
 
     "virtualmods"     shift, and go to state 335
     "type"            shift, and go to state 336
@@ -4127,8 +4126,8 @@ state 334
     '~'               shift, and go to state 342
     '!'               shift, and go to state 343
 
-    "actions"  reduce using rule 358 (@55)
-    $default   reduce using rule 355 (@53)
+    "actions"  reduce using rule 358 ($@55)
+    $default   reduce using rule 355 ($@53)
 
     locking      go to state 344
     repeat       go to state 345
@@ -4136,8 +4135,8 @@ state 334
     groupsclamp  go to state 347
     keydescs     go to state 451
     keydesc      go to state 452
-    @53          go to state 349
-    @55          go to state 350
+    $@53         go to state 349
+    $@55         go to state 350
 
 
 state 335
@@ -4196,16 +4195,16 @@ state 341
   362 keydesc: '[' . groupsyms ']'
   363        | '[' . actions ']'
 
-    NUM         reduce using rule 345 (@51)
-    IDENTIFIER  reduce using rule 345 (@51)
+    NUM         reduce using rule 345 ($@51)
+    IDENTIFIER  reduce using rule 345 ($@51)
     ','         reduce using rule 343 (groupsyms)
     ']'         reduce using rule 343 (groupsyms)
-    $default    reduce using rule 348 (@52)
+    $default    reduce using rule 348 ($@52)
 
     groupsyms  go to state 460
-    @51        go to state 461
+    $@51       go to state 461
     actions    go to state 462
-    @52        go to state 463
+    $@52       go to state 463
 
 
 state 342
@@ -4264,28 +4263,28 @@ state 347
 
 state 348
 
-  339 symbolssect: symbolssect "key" '.' @50 keydesc . ';'
+  339 symbolssect: symbolssect "key" '.' $@50 keydesc . ';'
 
     ';'  shift, and go to state 468
 
 
 state 349
 
-  357 keydesc: @53 . "symbols" '[' group ']' @54 '=' '[' groupsyms ']'
+  357 keydesc: $@53 . "symbols" '[' group ']' $@54 '=' '[' groupsyms ']'
 
     "symbols"  shift, and go to state 469
 
 
 state 350
 
-  360 keydesc: @55 . "actions" '[' group ']' @56 '=' '[' actions ']'
+  360 keydesc: $@55 . "actions" '[' group ']' $@56 '=' '[' actions ']'
 
     "actions"  shift, and go to state 470
 
 
 state 351
 
-  334 symbolssect: symbolssect "modifier_map" rmod @48 '{' . key_list '}' ';'
+  334 symbolssect: symbolssect "modifier_map" rmod $@48 '{' . key_list '}' ';'
 
     KEYCODE     shift, and go to state 471
     NUM         shift, and go to state 472
@@ -4297,14 +4296,14 @@ state 351
 
 state 352
 
-  332 symbolssect: symbolssect "override" "key" KEYCODE @47 . '{' keydescs '}' ';'
+  332 symbolssect: symbolssect "override" "key" KEYCODE $@47 . '{' keydescs '}' ';'
 
     '{'  shift, and go to state 476
 
 
 state 353
 
-  330 symbolssect: symbolssect "replace" "key" KEYCODE @46 . '{' keydescs '}' ';'
+  330 symbolssect: symbolssect "replace" "key" KEYCODE $@46 . '{' keydescs '}' ';'
 
     '{'  shift, and go to state 477
 
@@ -4321,7 +4320,7 @@ state 354
 state 355
 
   323 symbolinclude: symbolinclude . '{' symbolssect '}'
-  336 symbolssect: symbolssect include STR @49 symbolinclude .
+  336 symbolssect: symbolssect include STR $@49 symbolinclude .
 
     '{'  shift, and go to state 479
 
@@ -4330,7 +4329,7 @@ state 355
 
 state 356
 
-   25 keycodesect: KEYCODE '=' NUM ';' @2 keycodesect .
+   25 keycodesect: KEYCODE '=' NUM ';' $@2 keycodesect .
 
     $default  reduce using rule 25 (keycodesect)
 
@@ -4365,7 +4364,7 @@ state 358
 
 state 359
 
-   31 keycodesect: "alias" KEYCODE '=' KEYCODE ';' @4 . keycodesect
+   31 keycodesect: "alias" KEYCODE '=' KEYCODE ';' $@4 . keycodesect
 
     KEYCODE      shift, and go to state 41
     "minimum"    shift, and go to state 42
@@ -4386,7 +4385,7 @@ state 359
 
 state 360
 
-   27 keycodesect: "replace" KEYCODE '=' NUM ';' @3 . keycodesect
+   27 keycodesect: "replace" KEYCODE '=' NUM ';' $@3 . keycodesect
 
     KEYCODE      shift, and go to state 41
     "minimum"    shift, and go to state 42
@@ -4652,7 +4651,7 @@ state 390
 
 state 391
 
-  122 compatsect: compatsect "interpret" symbol '+' INTERPMATCH '(' . mods ')' @14 '{' interprets '}' ';'
+  122 compatsect: compatsect "interpret" symbol '+' INTERPMATCH '(' . mods ')' $@14 '{' interprets '}' ';'
 
     "all"   shift, and go to state 287
     "none"  shift, and go to state 288
@@ -4667,14 +4666,14 @@ state 391
 
 state 392
 
-  120 compatsect: compatsect "interpret" symbol '+' "any" @13 . '{' interprets '}' ';'
+  120 compatsect: compatsect "interpret" symbol '+' "any" $@13 . '{' interprets '}' ';'
 
     '{'  shift, and go to state 522
 
 
 state 393
 
-  118 compatsect: compatsect "interpret" symbol '+' rmod @12 . '{' interprets '}' ';'
+  118 compatsect: compatsect "interpret" symbol '+' rmod $@12 . '{' interprets '}' ';'
 
     '{'  shift, and go to state 523
 
@@ -4682,7 +4681,7 @@ state 393
 state 394
 
   103 interprets: interprets . interpret
-  116 compatsect: compatsect "interpret" symbol @11 '{' interprets . '}' ';'
+  116 compatsect: compatsect "interpret" symbol $@11 '{' interprets . '}' ';'
 
     "usemodmap"   shift, and go to state 261
     "repeat"      shift, and go to state 262
@@ -4780,21 +4779,21 @@ state 404
 
 state 405
 
-  286 actiondef: "setmods" '.' @31 setmodsparam ';' .
+  286 actiondef: "setmods" '.' $@31 setmodsparam ';' .
 
     $default  reduce using rule 286 (actiondef)
 
 
 state 406
 
-  288 actiondef: "latchmods" '.' @32 setmodsparam ';' .
+  288 actiondef: "latchmods" '.' $@32 setmodsparam ';' .
 
     $default  reduce using rule 288 (actiondef)
 
 
 state 407
 
-  290 actiondef: "lockmods" '.' @33 setmodsparam ';' .
+  290 actiondef: "lockmods" '.' $@33 setmodsparam ';' .
 
     $default  reduce using rule 290 (actiondef)
 
@@ -4859,21 +4858,21 @@ state 413
 
 state 414
 
-  292 actiondef: "setgroup" '.' @34 setgroupparam ';' .
+  292 actiondef: "setgroup" '.' $@34 setgroupparam ';' .
 
     $default  reduce using rule 292 (actiondef)
 
 
 state 415
 
-  294 actiondef: "latchgroup" '.' @35 setgroupparam ';' .
+  294 actiondef: "latchgroup" '.' $@35 setgroupparam ';' .
 
     $default  reduce using rule 294 (actiondef)
 
 
 state 416
 
-  296 actiondef: "lockgroup" '.' @36 setgroupparam ';' .
+  296 actiondef: "lockgroup" '.' $@36 setgroupparam ';' .
 
     $default  reduce using rule 296 (actiondef)
 
@@ -4912,7 +4911,7 @@ state 420
 
 state 421
 
-  298 actiondef: "moveptr" '.' @37 moveptrparam ';' .
+  298 actiondef: "moveptr" '.' $@37 moveptrparam ';' .
 
     $default  reduce using rule 298 (actiondef)
 
@@ -4949,7 +4948,7 @@ state 424
 
 state 425
 
-  300 actiondef: "ptrbtn" '.' @38 ptrbtnparam ';' .
+  300 actiondef: "ptrbtn" '.' $@38 ptrbtnparam ';' .
 
     $default  reduce using rule 300 (actiondef)
 
@@ -4982,14 +4981,14 @@ state 427
 
 state 428
 
-  304 actiondef: "setptrdflt" '.' @40 ptrdfltparam ';' .
+  304 actiondef: "setptrdflt" '.' $@40 ptrdfltparam ';' .
 
     $default  reduce using rule 304 (actiondef)
 
 
 state 429
 
-  302 actiondef: "lockptrbtn" '.' @39 ptrbtnparam ';' .
+  302 actiondef: "lockptrbtn" '.' $@39 ptrbtnparam ';' .
 
     $default  reduce using rule 302 (actiondef)
 
@@ -5009,14 +5008,14 @@ state 430
 
 state 431
 
-  306 actiondef: "setcontrols" '.' @41 ctrlparams ';' .
+  306 actiondef: "setcontrols" '.' $@41 ctrlparams ';' .
 
     $default  reduce using rule 306 (actiondef)
 
 
 state 432
 
-  308 actiondef: "lockcontrols" '.' @42 ctrlparams ';' .
+  308 actiondef: "lockcontrols" '.' $@42 ctrlparams ';' .
 
     $default  reduce using rule 308 (actiondef)
 
@@ -5078,7 +5077,7 @@ state 436
 
 state 437
 
-  310 actiondef: "isolock" '.' @43 isolockparam ';' .
+  310 actiondef: "isolock" '.' $@43 isolockparam ';' .
 
     $default  reduce using rule 310 (actiondef)
 
@@ -5127,7 +5126,7 @@ state 443
 
 state 444
 
-  312 actiondef: "switchscreen" '.' @44 switchscrnparam ';' .
+  312 actiondef: "switchscreen" '.' $@44 switchscrnparam ';' .
 
     $default  reduce using rule 312 (actiondef)
 
@@ -5136,14 +5135,14 @@ state 445
 
   109 compatinclude: '{' compatsect . '}'
   112 compatsect: compatsect . vmods_def
-  114           | compatsect . "interpret" '.' @10 interpret
-  116           | compatsect . "interpret" symbol @11 '{' interprets '}' ';'
-  118           | compatsect . "interpret" symbol '+' rmod @12 '{' interprets '}' ';'
-  120           | compatsect . "interpret" symbol '+' "any" @13 '{' interprets '}' ';'
-  122           | compatsect . "interpret" symbol '+' INTERPMATCH '(' mods ')' @14 '{' interprets '}' ';'
+  114           | compatsect . "interpret" '.' $@10 interpret
+  116           | compatsect . "interpret" symbol $@11 '{' interprets '}' ';'
+  118           | compatsect . "interpret" symbol '+' rmod $@12 '{' interprets '}' ';'
+  120           | compatsect . "interpret" symbol '+' "any" $@13 '{' interprets '}' ';'
+  122           | compatsect . "interpret" symbol '+' INTERPMATCH '(' mods ')' $@14 '{' interprets '}' ';'
   123           | compatsect . "group" NUM '=' mods ';'
   124           | compatsect . "indicator" STR '{' indicators '}' ';'
-  126           | compatsect . include STR @15 compatinclude
+  126           | compatsect . include STR $@15 compatinclude
   127           | compatsect . actiondef
   128           | compatsect . "indicator" '.' indicator
 
@@ -5191,7 +5190,7 @@ state 447
    61     | type . "map" '[' mods ']' '=' level ';'
    62     | type . "level_name" '[' level ']' '=' STR ';'
    63     | type . "preserve" '[' mods ']' '=' mods ';'
-   69 typessect: typessect "type" STR @8 '{' type . '}' ';'
+   69 typessect: typessect "type" STR $@8 '{' type . '}' ';'
 
     "map"         shift, and go to state 578
     "level_name"  shift, and go to state 579
@@ -5204,8 +5203,8 @@ state 448
 
    64 typesinclude: '{' typessect . '}'
    67 typessect: typessect . vmods_def
-   69          | typessect . "type" STR @8 '{' type '}' ';'
-   71          | typessect . include STR @9 typesinclude
+   69          | typessect . "type" STR $@8 '{' type '}' ';'
+   71          | typessect . include STR $@9 typesinclude
 
     "virtualmods"  shift, and go to state 73
     "type"         shift, and go to state 98
@@ -5237,7 +5236,7 @@ state 450
 
 state 451
 
-  328 symbolssect: symbolssect "key" KEYCODE @45 '{' keydescs . '}' ';'
+  328 symbolssect: symbolssect "key" KEYCODE $@45 '{' keydescs . '}' ';'
   351 keydescs: keydescs . ',' keydesc
 
     '}'  shift, and go to state 586
@@ -5325,7 +5324,7 @@ state 460
 
 state 461
 
-  346 groupsyms: @51 . symbolname
+  346 groupsyms: $@51 . symbolname
 
     NUM         shift, and go to state 472
     IDENTIFIER  shift, and go to state 473
@@ -5344,7 +5343,7 @@ state 462
 
 state 463
 
-  349 actions: @52 . action
+  349 actions: $@52 . action
 
     error           shift, and go to state 501
     "setmods"       shift, and go to state 502
@@ -5399,21 +5398,21 @@ state 467
 
 state 468
 
-  339 symbolssect: symbolssect "key" '.' @50 keydesc ';' .
+  339 symbolssect: symbolssect "key" '.' $@50 keydesc ';' .
 
     $default  reduce using rule 339 (symbolssect)
 
 
 state 469
 
-  357 keydesc: @53 "symbols" . '[' group ']' @54 '=' '[' groupsyms ']'
+  357 keydesc: $@53 "symbols" . '[' group ']' $@54 '=' '[' groupsyms ']'
 
     '['  shift, and go to state 602
 
 
 state 470
 
-  360 keydesc: @55 "actions" . '[' group ']' @56 '=' '[' actions ']'
+  360 keydesc: $@55 "actions" . '[' group ']' $@56 '=' '[' actions ']'
 
     '['  shift, and go to state 603
 
@@ -5443,7 +5442,7 @@ state 474
 
   318 key_list: key_list . ',' KEYCODE
   319         | key_list . ',' symbolname
-  334 symbolssect: symbolssect "modifier_map" rmod @48 '{' key_list . '}' ';'
+  334 symbolssect: symbolssect "modifier_map" rmod $@48 '{' key_list . '}' ';'
 
     '}'  shift, and go to state 604
     ','  shift, and go to state 605
@@ -5458,7 +5457,7 @@ state 475
 
 state 476
 
-  332 symbolssect: symbolssect "override" "key" KEYCODE @47 '{' . keydescs '}' ';'
+  332 symbolssect: symbolssect "override" "key" KEYCODE $@47 '{' . keydescs '}' ';'
 
     "virtualmods"     shift, and go to state 335
     "type"            shift, and go to state 336
@@ -5472,8 +5471,8 @@ state 476
     '~'               shift, and go to state 342
     '!'               shift, and go to state 343
 
-    "actions"  reduce using rule 358 (@55)
-    $default   reduce using rule 355 (@53)
+    "actions"  reduce using rule 358 ($@55)
+    $default   reduce using rule 355 ($@53)
 
     locking      go to state 344
     repeat       go to state 345
@@ -5481,13 +5480,13 @@ state 476
     groupsclamp  go to state 347
     keydescs     go to state 606
     keydesc      go to state 452
-    @53          go to state 349
-    @55          go to state 350
+    $@53         go to state 349
+    $@55         go to state 350
 
 
 state 477
 
-  330 symbolssect: symbolssect "replace" "key" KEYCODE @46 '{' . keydescs '}' ';'
+  330 symbolssect: symbolssect "replace" "key" KEYCODE $@46 '{' . keydescs '}' ';'
 
     "virtualmods"     shift, and go to state 335
     "type"            shift, and go to state 336
@@ -5501,8 +5500,8 @@ state 477
     '~'               shift, and go to state 342
     '!'               shift, and go to state 343
 
-    "actions"  reduce using rule 358 (@55)
-    $default   reduce using rule 355 (@53)
+    "actions"  reduce using rule 358 ($@55)
+    $default   reduce using rule 355 ($@53)
 
     locking      go to state 344
     repeat       go to state 345
@@ -5510,8 +5509,8 @@ state 477
     groupsclamp  go to state 347
     keydescs     go to state 607
     keydesc      go to state 452
-    @53          go to state 349
-    @55          go to state 350
+    $@53         go to state 349
+    $@55         go to state 350
 
 
 state 478
@@ -5519,13 +5518,13 @@ state 478
   322 symbolinclude: '{' symbolssect . '}'
   325 symbolssect: symbolssect . vmods_def
   326            | symbolssect . "name" '[' group ']' '=' STR ';'
-  328            | symbolssect . "key" KEYCODE @45 '{' keydescs '}' ';'
-  330            | symbolssect . "replace" "key" KEYCODE @46 '{' keydescs '}' ';'
-  332            | symbolssect . "override" "key" KEYCODE @47 '{' keydescs '}' ';'
-  334            | symbolssect . "modifier_map" rmod @48 '{' key_list '}' ';'
-  336            | symbolssect . include STR @49 symbolinclude
+  328            | symbolssect . "key" KEYCODE $@45 '{' keydescs '}' ';'
+  330            | symbolssect . "replace" "key" KEYCODE $@46 '{' keydescs '}' ';'
+  332            | symbolssect . "override" "key" KEYCODE $@47 '{' keydescs '}' ';'
+  334            | symbolssect . "modifier_map" rmod $@48 '{' key_list '}' ';'
+  336            | symbolssect . include STR $@49 symbolinclude
   337            | symbolssect . actiondef
-  339            | symbolssect . "key" '.' @50 keydesc ';'
+  339            | symbolssect . "key" '.' $@50 keydesc ';'
   340            | symbolssect . error ';'
 
     error           shift, and go to state 103
@@ -5576,14 +5575,14 @@ state 480
 
 state 481
 
-   31 keycodesect: "alias" KEYCODE '=' KEYCODE ';' @4 keycodesect .
+   31 keycodesect: "alias" KEYCODE '=' KEYCODE ';' $@4 keycodesect .
 
     $default  reduce using rule 31 (keycodesect)
 
 
 state 482
 
-   27 keycodesect: "replace" KEYCODE '=' NUM ';' @3 keycodesect .
+   27 keycodesect: "replace" KEYCODE '=' NUM ';' $@3 keycodesect .
 
     $default  reduce using rule 27 (keycodesect)
 
@@ -5731,65 +5730,65 @@ state 501
 
 state 502
 
-  252 action: "setmods" . @16 '(' setmodsparams ')'
+  252 action: "setmods" . $@16 '(' setmodsparams ')'
 
-    $default  reduce using rule 251 (@16)
+    $default  reduce using rule 251 ($@16)
 
-    @16  go to state 616
+    $@16  go to state 616
 
 
 state 503
 
-  254 action: "latchmods" . @17 '(' setmodsparams ')'
+  254 action: "latchmods" . $@17 '(' setmodsparams ')'
 
-    $default  reduce using rule 253 (@17)
+    $default  reduce using rule 253 ($@17)
 
-    @17  go to state 617
+    $@17  go to state 617
 
 
 state 504
 
-  256 action: "lockmods" . @18 '(' setmodsparams ')'
+  256 action: "lockmods" . $@18 '(' setmodsparams ')'
 
-    $default  reduce using rule 255 (@18)
+    $default  reduce using rule 255 ($@18)
 
-    @18  go to state 618
+    $@18  go to state 618
 
 
 state 505
 
-  258 action: "setgroup" . @19 '(' setgroupparams ')'
+  258 action: "setgroup" . $@19 '(' setgroupparams ')'
 
-    $default  reduce using rule 257 (@19)
+    $default  reduce using rule 257 ($@19)
 
-    @19  go to state 619
+    $@19  go to state 619
 
 
 state 506
 
-  260 action: "latchgroup" . @20 '(' setgroupparams ')'
+  260 action: "latchgroup" . $@20 '(' setgroupparams ')'
 
-    $default  reduce using rule 259 (@20)
+    $default  reduce using rule 259 ($@20)
 
-    @20  go to state 620
+    $@20  go to state 620
 
 
 state 507
 
-  262 action: "lockgroup" . @21 '(' setgroupparams ')'
+  262 action: "lockgroup" . $@21 '(' setgroupparams ')'
 
-    $default  reduce using rule 261 (@21)
+    $default  reduce using rule 261 ($@21)
 
-    @21  go to state 621
+    $@21  go to state 621
 
 
 state 508
 
-  264 action: "moveptr" . @22 '(' moveptrparams ')'
+  264 action: "moveptr" . $@22 '(' moveptrparams ')'
 
-    $default  reduce using rule 263 (@22)
+    $default  reduce using rule 263 ($@22)
 
-    @22  go to state 622
+    $@22  go to state 622
 
 
 state 509
@@ -5801,47 +5800,47 @@ state 509
 
 state 510
 
-  266 action: "ptrbtn" . @23 '(' ptrbtnparams ')'
+  266 action: "ptrbtn" . $@23 '(' ptrbtnparams ')'
 
-    $default  reduce using rule 265 (@23)
+    $default  reduce using rule 265 ($@23)
 
-    @23  go to state 624
+    $@23  go to state 624
 
 
 state 511
 
-  270 action: "setptrdflt" . @25 '(' ptrdfltparams ')'
+  270 action: "setptrdflt" . $@25 '(' ptrdfltparams ')'
 
-    $default  reduce using rule 269 (@25)
+    $default  reduce using rule 269 ($@25)
 
-    @25  go to state 625
+    $@25  go to state 625
 
 
 state 512
 
-  268 action: "lockptrbtn" . @24 '(' ptrbtnparams ')'
+  268 action: "lockptrbtn" . $@24 '(' ptrbtnparams ')'
 
-    $default  reduce using rule 267 (@24)
+    $default  reduce using rule 267 ($@24)
 
-    @24  go to state 626
+    $@24  go to state 626
 
 
 state 513
 
-  272 action: "setcontrols" . @26 '(' ctrlparams ')'
+  272 action: "setcontrols" . $@26 '(' ctrlparams ')'
 
-    $default  reduce using rule 271 (@26)
+    $default  reduce using rule 271 ($@26)
 
-    @26  go to state 627
+    $@26  go to state 627
 
 
 state 514
 
-  274 action: "lockcontrols" . @27 '(' ctrlparams ')'
+  274 action: "lockcontrols" . $@27 '(' ctrlparams ')'
 
-    $default  reduce using rule 273 (@27)
+    $default  reduce using rule 273 ($@27)
 
-    @27  go to state 628
+    $@27  go to state 628
 
 
 state 515
@@ -5853,11 +5852,11 @@ state 515
 
 state 516
 
-  281 action: "isolock" . @30 '(' isolockparams ')'
+  281 action: "isolock" . $@30 '(' isolockparams ')'
 
-    $default  reduce using rule 280 (@30)
+    $default  reduce using rule 280 ($@30)
 
-    @30  go to state 630
+    $@30  go to state 630
 
 
 state 517
@@ -5869,20 +5868,20 @@ state 517
 
 state 518
 
-  277 action: "switchscreen" . @28 '(' switchscrnparams ')'
+  277 action: "switchscreen" . $@28 '(' switchscrnparams ')'
 
-    $default  reduce using rule 276 (@28)
+    $default  reduce using rule 276 ($@28)
 
-    @28  go to state 632
+    $@28  go to state 632
 
 
 state 519
 
-  279 action: "consscroll" . @29 '(' consscrollparams ')'
+  279 action: "consscroll" . $@29 '(' consscrollparams ')'
 
-    $default  reduce using rule 278 (@29)
+    $default  reduce using rule 278 ($@29)
 
-    @29  go to state 633
+    $@29  go to state 633
 
 
 state 520
@@ -5896,7 +5895,7 @@ state 521
 
    48 mods: mods . '+' rmod
    49     | mods . '+' vmod
-  122 compatsect: compatsect "interpret" symbol '+' INTERPMATCH '(' mods . ')' @14 '{' interprets '}' ';'
+  122 compatsect: compatsect "interpret" symbol '+' INTERPMATCH '(' mods . ')' $@14 '{' interprets '}' ';'
 
     '+'  shift, and go to state 409
     ')'  shift, and go to state 635
@@ -5904,7 +5903,7 @@ state 521
 
 state 522
 
-  120 compatsect: compatsect "interpret" symbol '+' "any" @13 '{' . interprets '}' ';'
+  120 compatsect: compatsect "interpret" symbol '+' "any" $@13 '{' . interprets '}' ';'
 
     $default  reduce using rule 102 (interprets)
 
@@ -5913,7 +5912,7 @@ state 522
 
 state 523
 
-  118 compatsect: compatsect "interpret" symbol '+' rmod @12 '{' . interprets '}' ';'
+  118 compatsect: compatsect "interpret" symbol '+' rmod $@12 '{' . interprets '}' ';'
 
     $default  reduce using rule 102 (interprets)
 
@@ -5922,7 +5921,7 @@ state 523
 
 state 524
 
-  116 compatsect: compatsect "interpret" symbol @11 '{' interprets '}' . ';'
+  116 compatsect: compatsect "interpret" symbol $@11 '{' interprets '}' . ';'
 
     ';'  shift, and go to state 638
 
@@ -6314,14 +6313,14 @@ state 577
 
   110 compatinclude: compatinclude '{' compatsect . '}'
   112 compatsect: compatsect . vmods_def
-  114           | compatsect . "interpret" '.' @10 interpret
-  116           | compatsect . "interpret" symbol @11 '{' interprets '}' ';'
-  118           | compatsect . "interpret" symbol '+' rmod @12 '{' interprets '}' ';'
-  120           | compatsect . "interpret" symbol '+' "any" @13 '{' interprets '}' ';'
-  122           | compatsect . "interpret" symbol '+' INTERPMATCH '(' mods ')' @14 '{' interprets '}' ';'
+  114           | compatsect . "interpret" '.' $@10 interpret
+  116           | compatsect . "interpret" symbol $@11 '{' interprets '}' ';'
+  118           | compatsect . "interpret" symbol '+' rmod $@12 '{' interprets '}' ';'
+  120           | compatsect . "interpret" symbol '+' "any" $@13 '{' interprets '}' ';'
+  122           | compatsect . "interpret" symbol '+' INTERPMATCH '(' mods ')' $@14 '{' interprets '}' ';'
   123           | compatsect . "group" NUM '=' mods ';'
   124           | compatsect . "indicator" STR '{' indicators '}' ';'
-  126           | compatsect . include STR @15 compatinclude
+  126           | compatsect . include STR $@15 compatinclude
   127           | compatsect . actiondef
   128           | compatsect . "indicator" '.' indicator
 
@@ -6384,7 +6383,7 @@ state 581
 
 state 582
 
-   69 typessect: typessect "type" STR @8 '{' type '}' . ';'
+   69 typessect: typessect "type" STR $@8 '{' type '}' . ';'
 
     ';'  shift, and go to state 652
 
@@ -6400,8 +6399,8 @@ state 584
 
    65 typesinclude: typesinclude '{' typessect . '}'
    67 typessect: typessect . vmods_def
-   69          | typessect . "type" STR @8 '{' type '}' ';'
-   71          | typessect . include STR @9 typesinclude
+   69          | typessect . "type" STR $@8 '{' type '}' ';'
+   71          | typessect . include STR $@9 typesinclude
 
     "virtualmods"  shift, and go to state 73
     "type"         shift, and go to state 98
@@ -6424,7 +6423,7 @@ state 585
 
 state 586
 
-  328 symbolssect: symbolssect "key" KEYCODE @45 '{' keydescs '}' . ';'
+  328 symbolssect: symbolssect "key" KEYCODE $@45 '{' keydescs '}' . ';'
 
     ';'  shift, and go to state 655
 
@@ -6445,16 +6444,16 @@ state 587
     '~'               shift, and go to state 342
     '!'               shift, and go to state 343
 
-    "actions"  reduce using rule 358 (@55)
-    $default   reduce using rule 355 (@53)
+    "actions"  reduce using rule 358 ($@55)
+    $default   reduce using rule 355 ($@53)
 
     locking      go to state 344
     repeat       go to state 345
     groupswrap   go to state 346
     groupsclamp  go to state 347
     keydesc      go to state 656
-    @53          go to state 349
-    @55          go to state 350
+    $@53         go to state 349
+    $@55         go to state 350
 
 
 state 588
@@ -6536,7 +6535,7 @@ state 597
 
 state 598
 
-  346 groupsyms: @51 symbolname .
+  346 groupsyms: $@51 symbolname .
 
     $default  reduce using rule 346 (groupsyms)
 
@@ -6577,14 +6576,14 @@ state 600
 
 state 601
 
-  349 actions: @52 action .
+  349 actions: $@52 action .
 
     $default  reduce using rule 349 (actions)
 
 
 state 602
 
-  357 keydesc: @53 "symbols" '[' . group ']' @54 '=' '[' groupsyms ']'
+  357 keydesc: $@53 "symbols" '[' . group ']' $@54 '=' '[' groupsyms ']'
 
     HEX       shift, and go to state 225
     NUM       shift, and go to state 226
@@ -6595,7 +6594,7 @@ state 602
 
 state 603
 
-  360 keydesc: @55 "actions" '[' . group ']' @56 '=' '[' actions ']'
+  360 keydesc: $@55 "actions" '[' . group ']' $@56 '=' '[' actions ']'
 
     HEX       shift, and go to state 225
     NUM       shift, and go to state 226
@@ -6606,7 +6605,7 @@ state 603
 
 state 604
 
-  334 symbolssect: symbolssect "modifier_map" rmod @48 '{' key_list '}' . ';'
+  334 symbolssect: symbolssect "modifier_map" rmod $@48 '{' key_list '}' . ';'
 
     ';'  shift, and go to state 663
 
@@ -6625,7 +6624,7 @@ state 605
 
 state 606
 
-  332 symbolssect: symbolssect "override" "key" KEYCODE @47 '{' keydescs . '}' ';'
+  332 symbolssect: symbolssect "override" "key" KEYCODE $@47 '{' keydescs . '}' ';'
   351 keydescs: keydescs . ',' keydesc
 
     '}'  shift, and go to state 666
@@ -6634,7 +6633,7 @@ state 606
 
 state 607
 
-  330 symbolssect: symbolssect "replace" "key" KEYCODE @46 '{' keydescs . '}' ';'
+  330 symbolssect: symbolssect "replace" "key" KEYCODE $@46 '{' keydescs . '}' ';'
   351 keydescs: keydescs . ',' keydesc
 
     '}'  shift, and go to state 667
@@ -6653,13 +6652,13 @@ state 609
   323 symbolinclude: symbolinclude '{' symbolssect . '}'
   325 symbolssect: symbolssect . vmods_def
   326            | symbolssect . "name" '[' group ']' '=' STR ';'
-  328            | symbolssect . "key" KEYCODE @45 '{' keydescs '}' ';'
-  330            | symbolssect . "replace" "key" KEYCODE @46 '{' keydescs '}' ';'
-  332            | symbolssect . "override" "key" KEYCODE @47 '{' keydescs '}' ';'
-  334            | symbolssect . "modifier_map" rmod @48 '{' key_list '}' ';'
-  336            | symbolssect . include STR @49 symbolinclude
+  328            | symbolssect . "key" KEYCODE $@45 '{' keydescs '}' ';'
+  330            | symbolssect . "replace" "key" KEYCODE $@46 '{' keydescs '}' ';'
+  332            | symbolssect . "override" "key" KEYCODE $@47 '{' keydescs '}' ';'
+  334            | symbolssect . "modifier_map" rmod $@48 '{' key_list '}' ';'
+  336            | symbolssect . include STR $@49 symbolinclude
   337            | symbolssect . actiondef
-  339            | symbolssect . "key" '.' @50 keydesc ';'
+  339            | symbolssect . "key" '.' $@50 keydesc ';'
   340            | symbolssect . error ';'
 
     error           shift, and go to state 103
@@ -6736,49 +6735,49 @@ state 615
 
 state 616
 
-  252 action: "setmods" @16 . '(' setmodsparams ')'
+  252 action: "setmods" $@16 . '(' setmodsparams ')'
 
     '('  shift, and go to state 669
 
 
 state 617
 
-  254 action: "latchmods" @17 . '(' setmodsparams ')'
+  254 action: "latchmods" $@17 . '(' setmodsparams ')'
 
     '('  shift, and go to state 670
 
 
 state 618
 
-  256 action: "lockmods" @18 . '(' setmodsparams ')'
+  256 action: "lockmods" $@18 . '(' setmodsparams ')'
 
     '('  shift, and go to state 671
 
 
 state 619
 
-  258 action: "setgroup" @19 . '(' setgroupparams ')'
+  258 action: "setgroup" $@19 . '(' setgroupparams ')'
 
     '('  shift, and go to state 672
 
 
 state 620
 
-  260 action: "latchgroup" @20 . '(' setgroupparams ')'
+  260 action: "latchgroup" $@20 . '(' setgroupparams ')'
 
     '('  shift, and go to state 673
 
 
 state 621
 
-  262 action: "lockgroup" @21 . '(' setgroupparams ')'
+  262 action: "lockgroup" $@21 . '(' setgroupparams ')'
 
     '('  shift, and go to state 674
 
 
 state 622
 
-  264 action: "moveptr" @22 . '(' moveptrparams ')'
+  264 action: "moveptr" $@22 . '(' moveptrparams ')'
 
     '('  shift, and go to state 675
 
@@ -6798,35 +6797,35 @@ state 623
 
 state 624
 
-  266 action: "ptrbtn" @23 . '(' ptrbtnparams ')'
+  266 action: "ptrbtn" $@23 . '(' ptrbtnparams ')'
 
     '('  shift, and go to state 680
 
 
 state 625
 
-  270 action: "setptrdflt" @25 . '(' ptrdfltparams ')'
+  270 action: "setptrdflt" $@25 . '(' ptrdfltparams ')'
 
     '('  shift, and go to state 681
 
 
 state 626
 
-  268 action: "lockptrbtn" @24 . '(' ptrbtnparams ')'
+  268 action: "lockptrbtn" $@24 . '(' ptrbtnparams ')'
 
     '('  shift, and go to state 682
 
 
 state 627
 
-  272 action: "setcontrols" @26 . '(' ctrlparams ')'
+  272 action: "setcontrols" $@26 . '(' ctrlparams ')'
 
     '('  shift, and go to state 683
 
 
 state 628
 
-  274 action: "lockcontrols" @27 . '(' ctrlparams ')'
+  274 action: "lockcontrols" $@27 . '(' ctrlparams ')'
 
     '('  shift, and go to state 684
 
@@ -6840,7 +6839,7 @@ state 629
 
 state 630
 
-  281 action: "isolock" @30 . '(' isolockparams ')'
+  281 action: "isolock" $@30 . '(' isolockparams ')'
 
     '('  shift, and go to state 686
 
@@ -6854,14 +6853,14 @@ state 631
 
 state 632
 
-  277 action: "switchscreen" @28 . '(' switchscrnparams ')'
+  277 action: "switchscreen" $@28 . '(' switchscrnparams ')'
 
     '('  shift, and go to state 688
 
 
 state 633
 
-  279 action: "consscroll" @29 . '(' consscrollparams ')'
+  279 action: "consscroll" $@29 . '(' consscrollparams ')'
 
     '('  shift, and go to state 689
 
@@ -6875,17 +6874,17 @@ state 634
 
 state 635
 
-  122 compatsect: compatsect "interpret" symbol '+' INTERPMATCH '(' mods ')' . @14 '{' interprets '}' ';'
+  122 compatsect: compatsect "interpret" symbol '+' INTERPMATCH '(' mods ')' . $@14 '{' interprets '}' ';'
 
-    $default  reduce using rule 121 (@14)
+    $default  reduce using rule 121 ($@14)
 
-    @14  go to state 690
+    $@14  go to state 690
 
 
 state 636
 
   103 interprets: interprets . interpret
-  120 compatsect: compatsect "interpret" symbol '+' "any" @13 '{' interprets . '}' ';'
+  120 compatsect: compatsect "interpret" symbol '+' "any" $@13 '{' interprets . '}' ';'
 
     "usemodmap"   shift, and go to state 261
     "repeat"      shift, and go to state 262
@@ -6904,7 +6903,7 @@ state 636
 state 637
 
   103 interprets: interprets . interpret
-  118 compatsect: compatsect "interpret" symbol '+' rmod @12 '{' interprets . '}' ';'
+  118 compatsect: compatsect "interpret" symbol '+' rmod $@12 '{' interprets . '}' ';'
 
     "usemodmap"   shift, and go to state 261
     "repeat"      shift, and go to state 262
@@ -6922,7 +6921,7 @@ state 637
 
 state 638
 
-  116 compatsect: compatsect "interpret" symbol @11 '{' interprets '}' ';' .
+  116 compatsect: compatsect "interpret" symbol $@11 '{' interprets '}' ';' .
 
     $default  reduce using rule 116 (compatsect)
 
@@ -7048,7 +7047,7 @@ state 651
 
 state 652
 
-   69 typessect: typessect "type" STR @8 '{' type '}' ';' .
+   69 typessect: typessect "type" STR $@8 '{' type '}' ';' .
 
     $default  reduce using rule 69 (typessect)
 
@@ -7069,7 +7068,7 @@ state 654
 
 state 655
 
-  328 symbolssect: symbolssect "key" KEYCODE @45 '{' keydescs '}' ';' .
+  328 symbolssect: symbolssect "key" KEYCODE $@45 '{' keydescs '}' ';' .
 
     $default  reduce using rule 328 (symbolssect)
 
@@ -7111,21 +7110,21 @@ state 660
 
 state 661
 
-  357 keydesc: @53 "symbols" '[' group . ']' @54 '=' '[' groupsyms ']'
+  357 keydesc: $@53 "symbols" '[' group . ']' $@54 '=' '[' groupsyms ']'
 
     ']'  shift, and go to state 698
 
 
 state 662
 
-  360 keydesc: @55 "actions" '[' group . ']' @56 '=' '[' actions ']'
+  360 keydesc: $@55 "actions" '[' group . ']' $@56 '=' '[' actions ']'
 
     ']'  shift, and go to state 699
 
 
 state 663
 
-  334 symbolssect: symbolssect "modifier_map" rmod @48 '{' key_list '}' ';' .
+  334 symbolssect: symbolssect "modifier_map" rmod $@48 '{' key_list '}' ';' .
 
     $default  reduce using rule 334 (symbolssect)
 
@@ -7146,14 +7145,14 @@ state 665
 
 state 666
 
-  332 symbolssect: symbolssect "override" "key" KEYCODE @47 '{' keydescs '}' . ';'
+  332 symbolssect: symbolssect "override" "key" KEYCODE $@47 '{' keydescs '}' . ';'
 
     ';'  shift, and go to state 700
 
 
 state 667
 
-  330 symbolssect: symbolssect "replace" "key" KEYCODE @46 '{' keydescs '}' . ';'
+  330 symbolssect: symbolssect "replace" "key" KEYCODE $@46 '{' keydescs '}' . ';'
 
     ';'  shift, and go to state 701
 
@@ -7167,7 +7166,7 @@ state 668
 
 state 669
 
-  252 action: "setmods" @16 '(' . setmodsparams ')'
+  252 action: "setmods" $@16 '(' . setmodsparams ')'
 
     "usemodmap"    shift, and go to state 275
     "clearlocks"   shift, and go to state 276
@@ -7187,7 +7186,7 @@ state 669
 
 state 670
 
-  254 action: "latchmods" @17 '(' . setmodsparams ')'
+  254 action: "latchmods" $@17 '(' . setmodsparams ')'
 
     "usemodmap"    shift, and go to state 275
     "clearlocks"   shift, and go to state 276
@@ -7207,7 +7206,7 @@ state 670
 
 state 671
 
-  256 action: "lockmods" @18 '(' . setmodsparams ')'
+  256 action: "lockmods" $@18 '(' . setmodsparams ')'
 
     "usemodmap"    shift, and go to state 275
     "clearlocks"   shift, and go to state 276
@@ -7227,7 +7226,7 @@ state 671
 
 state 672
 
-  258 action: "setgroup" @19 '(' . setgroupparams ')'
+  258 action: "setgroup" $@19 '(' . setgroupparams ')'
 
     "clearlocks"   shift, and go to state 276
     "latchtolock"  shift, and go to state 278
@@ -7245,7 +7244,7 @@ state 672
 
 state 673
 
-  260 action: "latchgroup" @20 '(' . setgroupparams ')'
+  260 action: "latchgroup" $@20 '(' . setgroupparams ')'
 
     "clearlocks"   shift, and go to state 276
     "latchtolock"  shift, and go to state 278
@@ -7263,7 +7262,7 @@ state 673
 
 state 674
 
-  262 action: "lockgroup" @21 '(' . setgroupparams ')'
+  262 action: "lockgroup" $@21 '(' . setgroupparams ')'
 
     "clearlocks"   shift, and go to state 276
     "latchtolock"  shift, and go to state 278
@@ -7281,7 +7280,7 @@ state 674
 
 state 675
 
-  264 action: "moveptr" @22 '(' . moveptrparams ')'
+  264 action: "moveptr" $@22 '(' . moveptrparams ')'
 
     IDENTIFIER  shift, and go to state 300
     "accel"     shift, and go to state 301
@@ -7327,7 +7326,7 @@ state 679
 
 state 680
 
-  266 action: "ptrbtn" @23 '(' . ptrbtnparams ')'
+  266 action: "ptrbtn" $@23 '(' . ptrbtnparams ')'
 
     "button"  shift, and go to state 306
     "count"   shift, and go to state 307
@@ -7341,7 +7340,7 @@ state 680
 
 state 681
 
-  270 action: "setptrdflt" @25 '(' . ptrdfltparams ')'
+  270 action: "setptrdflt" $@25 '(' . ptrdfltparams ')'
 
     "button"  shift, and go to state 310
     "affect"  shift, and go to state 311
@@ -7354,7 +7353,7 @@ state 681
 
 state 682
 
-  268 action: "lockptrbtn" @24 '(' . ptrbtnparams ')'
+  268 action: "lockptrbtn" $@24 '(' . ptrbtnparams ')'
 
     "button"  shift, and go to state 306
     "count"   shift, and go to state 307
@@ -7368,7 +7367,7 @@ state 682
 
 state 683
 
-  272 action: "setcontrols" @26 '(' . ctrlparams ')'
+  272 action: "setcontrols" $@26 '(' . ctrlparams ')'
 
     "controls"  shift, and go to state 314
 
@@ -7377,7 +7376,7 @@ state 683
 
 state 684
 
-  274 action: "lockcontrols" @27 '(' . ctrlparams ')'
+  274 action: "lockcontrols" $@27 '(' . ctrlparams ')'
 
     "controls"  shift, and go to state 314
 
@@ -7393,7 +7392,7 @@ state 685
 
 state 686
 
-  281 action: "isolock" @30 '(' . isolockparams ')'
+  281 action: "isolock" $@30 '(' . isolockparams ')'
 
     "mods"      shift, and go to state 317
     "group"     shift, and go to state 318
@@ -7415,7 +7414,7 @@ state 687
 
 state 688
 
-  277 action: "switchscreen" @28 '(' . switchscrnparams ')'
+  277 action: "switchscreen" $@28 '(' . switchscrnparams ')'
 
     "sameserver"  shift, and go to state 322
     "screen"      shift, and go to state 323
@@ -7429,7 +7428,7 @@ state 688
 
 state 689
 
-  279 action: "consscroll" @29 '(' . consscrollparams ')'
+  279 action: "consscroll" $@29 '(' . consscrollparams ')'
 
     "screen"   shift, and go to state 727
     "line"     shift, and go to state 728
@@ -7441,21 +7440,21 @@ state 689
 
 state 690
 
-  122 compatsect: compatsect "interpret" symbol '+' INTERPMATCH '(' mods ')' @14 . '{' interprets '}' ';'
+  122 compatsect: compatsect "interpret" symbol '+' INTERPMATCH '(' mods ')' $@14 . '{' interprets '}' ';'
 
     '{'  shift, and go to state 732
 
 
 state 691
 
-  120 compatsect: compatsect "interpret" symbol '+' "any" @13 '{' interprets '}' . ';'
+  120 compatsect: compatsect "interpret" symbol '+' "any" $@13 '{' interprets '}' . ';'
 
     ';'  shift, and go to state 733
 
 
 state 692
 
-  118 compatsect: compatsect "interpret" symbol '+' rmod @12 '{' interprets '}' . ';'
+  118 compatsect: compatsect "interpret" symbol '+' rmod $@12 '{' interprets '}' . ';'
 
     ';'  shift, and go to state 734
 
@@ -7506,32 +7505,32 @@ state 697
 
 state 698
 
-  357 keydesc: @53 "symbols" '[' group ']' . @54 '=' '[' groupsyms ']'
+  357 keydesc: $@53 "symbols" '[' group ']' . $@54 '=' '[' groupsyms ']'
 
-    $default  reduce using rule 356 (@54)
+    $default  reduce using rule 356 ($@54)
 
-    @54  go to state 740
+    $@54  go to state 740
 
 
 state 699
 
-  360 keydesc: @55 "actions" '[' group ']' . @56 '=' '[' actions ']'
+  360 keydesc: $@55 "actions" '[' group ']' . $@56 '=' '[' actions ']'
 
-    $default  reduce using rule 359 (@56)
+    $default  reduce using rule 359 ($@56)
 
-    @56  go to state 741
+    $@56  go to state 741
 
 
 state 700
 
-  332 symbolssect: symbolssect "override" "key" KEYCODE @47 '{' keydescs '}' ';' .
+  332 symbolssect: symbolssect "override" "key" KEYCODE $@47 '{' keydescs '}' ';' .
 
     $default  reduce using rule 332 (symbolssect)
 
 
 state 701
 
-  330 symbolssect: symbolssect "replace" "key" KEYCODE @46 '{' keydescs '}' ';' .
+  330 symbolssect: symbolssect "replace" "key" KEYCODE $@46 '{' keydescs '}' ';' .
 
     $default  reduce using rule 330 (symbolssect)
 
@@ -7539,7 +7538,7 @@ state 701
 state 702
 
   167 setmodsparams: setmodsparams . ',' setmodsparam
-  252 action: "setmods" @16 '(' setmodsparams . ')'
+  252 action: "setmods" $@16 '(' setmodsparams . ')'
 
     ','  shift, and go to state 742
     ')'  shift, and go to state 743
@@ -7555,7 +7554,7 @@ state 703
 state 704
 
   167 setmodsparams: setmodsparams . ',' setmodsparam
-  254 action: "latchmods" @17 '(' setmodsparams . ')'
+  254 action: "latchmods" $@17 '(' setmodsparams . ')'
 
     ','  shift, and go to state 742
     ')'  shift, and go to state 744
@@ -7564,7 +7563,7 @@ state 704
 state 705
 
   167 setmodsparams: setmodsparams . ',' setmodsparam
-  256 action: "lockmods" @18 '(' setmodsparams . ')'
+  256 action: "lockmods" $@18 '(' setmodsparams . ')'
 
     ','  shift, and go to state 742
     ')'  shift, and go to state 745
@@ -7573,7 +7572,7 @@ state 705
 state 706
 
   175 setgroupparams: setgroupparams . ',' setgroupparam
-  258 action: "setgroup" @19 '(' setgroupparams . ')'
+  258 action: "setgroup" $@19 '(' setgroupparams . ')'
 
     ','  shift, and go to state 746
     ')'  shift, and go to state 747
@@ -7589,7 +7588,7 @@ state 707
 state 708
 
   175 setgroupparams: setgroupparams . ',' setgroupparam
-  260 action: "latchgroup" @20 '(' setgroupparams . ')'
+  260 action: "latchgroup" $@20 '(' setgroupparams . ')'
 
     ','  shift, and go to state 746
     ')'  shift, and go to state 748
@@ -7598,7 +7597,7 @@ state 708
 state 709
 
   175 setgroupparams: setgroupparams . ',' setgroupparam
-  262 action: "lockgroup" @21 '(' setgroupparams . ')'
+  262 action: "lockgroup" $@21 '(' setgroupparams . ')'
 
     ','  shift, and go to state 746
     ')'  shift, and go to state 749
@@ -7607,7 +7606,7 @@ state 709
 state 710
 
   183 moveptrparams: moveptrparams . ',' moveptrparam
-  264 action: "moveptr" @22 '(' moveptrparams . ')'
+  264 action: "moveptr" $@22 '(' moveptrparams . ')'
 
     ','  shift, and go to state 750
     ')'  shift, and go to state 751
@@ -7654,7 +7653,7 @@ state 715
 state 716
 
   197 ptrbtnparams: ptrbtnparams . ',' ptrbtnparam
-  266 action: "ptrbtn" @23 '(' ptrbtnparams . ')'
+  266 action: "ptrbtn" $@23 '(' ptrbtnparams . ')'
 
     ','  shift, and go to state 755
     ')'  shift, and go to state 756
@@ -7670,7 +7669,7 @@ state 717
 state 718
 
   206 ptrdfltparams: ptrdfltparams . ',' ptrdfltparam
-  270 action: "setptrdflt" @25 '(' ptrdfltparams . ')'
+  270 action: "setptrdflt" $@25 '(' ptrdfltparams . ')'
 
     ','  shift, and go to state 757
     ')'  shift, and go to state 758
@@ -7686,7 +7685,7 @@ state 719
 state 720
 
   197 ptrbtnparams: ptrbtnparams . ',' ptrbtnparam
-  268 action: "lockptrbtn" @24 '(' ptrbtnparams . ')'
+  268 action: "lockptrbtn" $@24 '(' ptrbtnparams . ')'
 
     ','  shift, and go to state 755
     ')'  shift, and go to state 759
@@ -7694,14 +7693,14 @@ state 720
 
 state 721
 
-  272 action: "setcontrols" @26 '(' ctrlparams . ')'
+  272 action: "setcontrols" $@26 '(' ctrlparams . ')'
 
     ')'  shift, and go to state 760
 
 
 state 722
 
-  274 action: "lockcontrols" @27 '(' ctrlparams . ')'
+  274 action: "lockcontrols" $@27 '(' ctrlparams . ')'
 
     ')'  shift, and go to state 761
 
@@ -7709,7 +7708,7 @@ state 722
 state 723
 
   226 isolockparams: isolockparams . ',' isolockparam
-  281 action: "isolock" @30 '(' isolockparams . ')'
+  281 action: "isolock" $@30 '(' isolockparams . ')'
 
     ','  shift, and go to state 762
     ')'  shift, and go to state 763
@@ -7725,7 +7724,7 @@ state 724
 state 725
 
   233 switchscrnparams: switchscrnparams . ',' switchscrnparam
-  277 action: "switchscreen" @28 '(' switchscrnparams . ')'
+  277 action: "switchscreen" $@28 '(' switchscrnparams . ')'
 
     ','  shift, and go to state 764
     ')'  shift, and go to state 765
@@ -7768,7 +7767,7 @@ state 729
 state 730
 
   239 consscrollparams: consscrollparams . ',' consscrollparam
-  279 action: "consscroll" @29 '(' consscrollparams . ')'
+  279 action: "consscroll" $@29 '(' consscrollparams . ')'
 
     ','  shift, and go to state 772
     ')'  shift, and go to state 773
@@ -7783,7 +7782,7 @@ state 731
 
 state 732
 
-  122 compatsect: compatsect "interpret" symbol '+' INTERPMATCH '(' mods ')' @14 '{' . interprets '}' ';'
+  122 compatsect: compatsect "interpret" symbol '+' INTERPMATCH '(' mods ')' $@14 '{' . interprets '}' ';'
 
     $default  reduce using rule 102 (interprets)
 
@@ -7792,14 +7791,14 @@ state 732
 
 state 733
 
-  120 compatsect: compatsect "interpret" symbol '+' "any" @13 '{' interprets '}' ';' .
+  120 compatsect: compatsect "interpret" symbol '+' "any" $@13 '{' interprets '}' ';' .
 
     $default  reduce using rule 120 (compatsect)
 
 
 state 734
 
-  118 compatsect: compatsect "interpret" symbol '+' rmod @12 '{' interprets '}' ';' .
+  118 compatsect: compatsect "interpret" symbol '+' rmod $@12 '{' interprets '}' ';' .
 
     $default  reduce using rule 118 (compatsect)
 
@@ -7841,14 +7840,14 @@ state 739
 
 state 740
 
-  357 keydesc: @53 "symbols" '[' group ']' @54 . '=' '[' groupsyms ']'
+  357 keydesc: $@53 "symbols" '[' group ']' $@54 . '=' '[' groupsyms ']'
 
     '='  shift, and go to state 778
 
 
 state 741
 
-  360 keydesc: @55 "actions" '[' group ']' @56 . '=' '[' actions ']'
+  360 keydesc: $@55 "actions" '[' group ']' $@56 . '=' '[' actions ']'
 
     '='  shift, and go to state 779
 
@@ -7872,21 +7871,21 @@ state 742
 
 state 743
 
-  252 action: "setmods" @16 '(' setmodsparams ')' .
+  252 action: "setmods" $@16 '(' setmodsparams ')' .
 
     $default  reduce using rule 252 (action)
 
 
 state 744
 
-  254 action: "latchmods" @17 '(' setmodsparams ')' .
+  254 action: "latchmods" $@17 '(' setmodsparams ')' .
 
     $default  reduce using rule 254 (action)
 
 
 state 745
 
-  256 action: "lockmods" @18 '(' setmodsparams ')' .
+  256 action: "lockmods" $@18 '(' setmodsparams ')' .
 
     $default  reduce using rule 256 (action)
 
@@ -7908,21 +7907,21 @@ state 746
 
 state 747
 
-  258 action: "setgroup" @19 '(' setgroupparams ')' .
+  258 action: "setgroup" $@19 '(' setgroupparams ')' .
 
     $default  reduce using rule 258 (action)
 
 
 state 748
 
-  260 action: "latchgroup" @20 '(' setgroupparams ')' .
+  260 action: "latchgroup" $@20 '(' setgroupparams ')' .
 
     $default  reduce using rule 260 (action)
 
 
 state 749
 
-  262 action: "lockgroup" @21 '(' setgroupparams ')' .
+  262 action: "lockgroup" $@21 '(' setgroupparams ')' .
 
     $default  reduce using rule 262 (action)
 
@@ -7942,7 +7941,7 @@ state 750
 
 state 751
 
-  264 action: "moveptr" @22 '(' moveptrparams ')' .
+  264 action: "moveptr" $@22 '(' moveptrparams ')' .
 
     $default  reduce using rule 264 (action)
 
@@ -7981,7 +7980,7 @@ state 755
 
 state 756
 
-  266 action: "ptrbtn" @23 '(' ptrbtnparams ')' .
+  266 action: "ptrbtn" $@23 '(' ptrbtnparams ')' .
 
     $default  reduce using rule 266 (action)
 
@@ -7998,28 +7997,28 @@ state 757
 
 state 758
 
-  270 action: "setptrdflt" @25 '(' ptrdfltparams ')' .
+  270 action: "setptrdflt" $@25 '(' ptrdfltparams ')' .
 
     $default  reduce using rule 270 (action)
 
 
 state 759
 
-  268 action: "lockptrbtn" @24 '(' ptrbtnparams ')' .
+  268 action: "lockptrbtn" $@24 '(' ptrbtnparams ')' .
 
     $default  reduce using rule 268 (action)
 
 
 state 760
 
-  272 action: "setcontrols" @26 '(' ctrlparams ')' .
+  272 action: "setcontrols" $@26 '(' ctrlparams ')' .
 
     $default  reduce using rule 272 (action)
 
 
 state 761
 
-  274 action: "lockcontrols" @27 '(' ctrlparams ')' .
+  274 action: "lockcontrols" $@27 '(' ctrlparams ')' .
 
     $default  reduce using rule 274 (action)
 
@@ -8038,7 +8037,7 @@ state 762
 
 state 763
 
-  281 action: "isolock" @30 '(' isolockparams ')' .
+  281 action: "isolock" $@30 '(' isolockparams ')' .
 
     $default  reduce using rule 281 (action)
 
@@ -8058,7 +8057,7 @@ state 764
 
 state 765
 
-  277 action: "switchscreen" @28 '(' switchscrnparams ')' .
+  277 action: "switchscreen" $@28 '(' switchscrnparams ')' .
 
     $default  reduce using rule 277 (action)
 
@@ -8118,7 +8117,7 @@ state 772
 
 state 773
 
-  279 action: "consscroll" @29 '(' consscrollparams ')' .
+  279 action: "consscroll" $@29 '(' consscrollparams ')' .
 
     $default  reduce using rule 279 (action)
 
@@ -8126,7 +8125,7 @@ state 773
 state 774
 
   103 interprets: interprets . interpret
-  122 compatsect: compatsect "interpret" symbol '+' INTERPMATCH '(' mods ')' @14 '{' interprets . '}' ';'
+  122 compatsect: compatsect "interpret" symbol '+' INTERPMATCH '(' mods ')' $@14 '{' interprets . '}' ';'
 
     "usemodmap"   shift, and go to state 261
     "repeat"      shift, and go to state 262
@@ -8177,14 +8176,14 @@ state 777
 
 state 778
 
-  357 keydesc: @53 "symbols" '[' group ']' @54 '=' . '[' groupsyms ']'
+  357 keydesc: $@53 "symbols" '[' group ']' $@54 '=' . '[' groupsyms ']'
 
     '['  shift, and go to state 798
 
 
 state 779
 
-  360 keydesc: @55 "actions" '[' group ']' @56 '=' . '[' actions ']'
+  360 keydesc: $@55 "actions" '[' group ']' $@56 '=' . '[' actions ']'
 
     '['  shift, and go to state 799
 
@@ -8289,7 +8288,7 @@ state 793
 
 state 794
 
-  122 compatsect: compatsect "interpret" symbol '+' INTERPMATCH '(' mods ')' @14 '{' interprets '}' . ';'
+  122 compatsect: compatsect "interpret" symbol '+' INTERPMATCH '(' mods ')' $@14 '{' interprets '}' . ';'
 
     ';'  shift, and go to state 804
 
@@ -8320,24 +8319,24 @@ state 797
 
 state 798
 
-  357 keydesc: @53 "symbols" '[' group ']' @54 '=' '[' . groupsyms ']'
+  357 keydesc: $@53 "symbols" '[' group ']' $@54 '=' '[' . groupsyms ']'
 
-    NUM         reduce using rule 345 (@51)
-    IDENTIFIER  reduce using rule 345 (@51)
+    NUM         reduce using rule 345 ($@51)
+    IDENTIFIER  reduce using rule 345 ($@51)
     $default    reduce using rule 343 (groupsyms)
 
     groupsyms  go to state 808
-    @51        go to state 461
+    $@51       go to state 461
 
 
 state 799
 
-  360 keydesc: @55 "actions" '[' group ']' @56 '=' '[' . actions ']'
+  360 keydesc: $@55 "actions" '[' group ']' $@56 '=' '[' . actions ']'
 
-    $default  reduce using rule 348 (@52)
+    $default  reduce using rule 348 ($@52)
 
     actions  go to state 809
-    @52      go to state 463
+    $@52     go to state 463
 
 
 state 800
@@ -8370,7 +8369,7 @@ state 803
 
 state 804
 
-  122 compatsect: compatsect "interpret" symbol '+' INTERPMATCH '(' mods ')' @14 '{' interprets '}' ';' .
+  122 compatsect: compatsect "interpret" symbol '+' INTERPMATCH '(' mods ')' $@14 '{' interprets '}' ';' .
 
     $default  reduce using rule 122 (compatsect)
 
@@ -8399,7 +8398,7 @@ state 807
 state 808
 
   344 groupsyms: groupsyms . ',' symbolname
-  357 keydesc: @53 "symbols" '[' group ']' @54 '=' '[' groupsyms . ']'
+  357 keydesc: $@53 "symbols" '[' group ']' $@54 '=' '[' groupsyms . ']'
 
     ','  shift, and go to state 596
     ']'  shift, and go to state 810
@@ -8408,7 +8407,7 @@ state 808
 state 809
 
   347 actions: actions . ',' action
-  360 keydesc: @55 "actions" '[' group ']' @56 '=' '[' actions . ']'
+  360 keydesc: $@55 "actions" '[' group ']' $@56 '=' '[' actions . ']'
 
     ','  shift, and go to state 599
     ']'  shift, and go to state 811
@@ -8416,13 +8415,13 @@ state 809
 
 state 810
 
-  357 keydesc: @53 "symbols" '[' group ']' @54 '=' '[' groupsyms ']' .
+  357 keydesc: $@53 "symbols" '[' group ']' $@54 '=' '[' groupsyms ']' .
 
     $default  reduce using rule 357 (keydesc)
 
 
 state 811
 
-  360 keydesc: @55 "actions" '[' group ']' @56 '=' '[' actions ']' .
+  360 keydesc: $@55 "actions" '[' group ']' $@56 '=' '[' actions ']' .
 
     $default  reduce using rule 360 (keydesc)

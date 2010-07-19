@@ -1,27 +1,36 @@
-/* A Bison parser, made by GNU Bison 1.875a.  */
+/* A Bison parser, made by GNU Bison 2.4.2.  */
 
-/* Skeleton parser for Yacc-like parsing with Bison,
-   Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002, 2003 Free Software Foundation, Inc.
-
-   This program is free software; you can redistribute it and/or modify
+/* Skeleton interface for Bison's Yacc-like parsers in C
+   
+      Copyright (C) 1984, 1989-1990, 2000-2006, 2009-2010 Free Software
+   Foundation, Inc.
+   
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
-
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
+   
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-
+   
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place - Suite 330,
-   Boston, MA 02111-1307, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
-/* As a special exception, when this file is copied by Bison into a
-   Bison output file, you may use that output file without restriction.
-   This special exception was added by the Free Software Foundation
-   in version 1.24 of Bison.  */
+/* As a special exception, you may create a larger work that contains
+   part or all of the Bison parser skeleton and distribute that work
+   under terms of your choice, so long as that work isn't itself a
+   parser generator using the skeleton or a modified version thereof
+   as a parser skeleton.  Alternatively, if you modify or redistribute
+   the parser skeleton itself, you may (at your option) remove this
+   special exception, which will cause the skeleton and the resulting
+   Bison output files to be licensed under the GNU General Public
+   License without this special exception.
+   
+   This special exception was added by the Free Software Foundation in
+   version 2.2 of Bison.  */
+
 
 /* Tokens.  */
 #ifndef YYTOKENTYPE
@@ -135,132 +144,33 @@
      FLOAT = 361
    };
 #endif
-#define XKBKEYMAP 258
-#define XKBKEYCODES 259
-#define XKBCOMPAT 260
-#define XKBGEOMETRY 261
-#define XKBTYPES 262
-#define XKBSYMBOLS 263
-#define STR 264
-#define HEX 265
-#define FLAGS 266
-#define KEYCODE 267
-#define NUM 268
-#define MINIMUM 269
-#define MAXIMUM 270
-#define VIRTUAL 271
-#define INDICATOR 272
-#define ALIAS 273
-#define IDENTIFIER 274
-#define VMODS 275
-#define TYPE 276
-#define DATA 277
-#define MAP 278
-#define LEVEL_NAME 279
-#define PRESERVE 280
-#define LEVEL 281
-#define USEMODMAP 282
-#define REPEAT 283
-#define LOCKING 284
-#define VIRTUALMODIFIER 285
-#define BOOLEAN 286
-#define INTERPRET 287
-#define INTERPMATCH 288
-#define CLEARLOCKS 289
-#define MODS 290
-#define SETMODS 291
-#define LATCHMODS 292
-#define LOCKMODS 293
-#define ACTION 294
-#define LATCHTOLOCK 295
-#define GROUP 296
-#define GROUPS 297
-#define SETGROUP 298
-#define LATCHGROUP 299
-#define LOCKGROUP 300
-#define ACCEL 301
-#define MOVEPTR 302
-#define PRIVATE 303
-#define BUTTON 304
-#define BUTTONNUM 305
-#define DEFAULT 306
-#define COUNT 307
-#define PTRBTN 308
-#define DEFAULTBTN 309
-#define ALL 310
-#define NONE 311
-#define ANY 312
-#define CONTROLFLAG 313
-#define AFFECT 314
-#define PTRDFLT 315
-#define LOCKPTRBTN 316
-#define SETCONTROLS 317
-#define LOCKCONTROLS 318
-#define CONTROLS 319
-#define TERMINATE 320
-#define WHICHMODSTATE 321
-#define WHICHGROUPSTATE 322
-#define WHICHSTATE 323
-#define INDEX 324
-#define ALLOWEXPLICIT 325
-#define DRIVESKBD 326
-#define SYMBOLS 327
-#define NAME 328
-#define GROUPNUM 329
-#define ACTIONS 330
-#define KEY 331
-#define MODMAP 332
-#define SHIFT 333
-#define LOCK 334
-#define CONTROL 335
-#define MOD1 336
-#define MOD2 337
-#define MOD3 338
-#define MOD4 339
-#define MOD5 340
-#define UNLOCK 341
-#define BOTH 342
-#define NEITHER 343
-#define INCLUDE 344
-#define AUGMENT 345
-#define OVERRIDE 346
-#define REPLACE 347
-#define ISOLOCK 348
-#define POINTERS 349
-#define NOACTION 350
-#define GROUPSWRAP 351
-#define GROUPSCLAMP 352
-#define GROUPSREDIRECT 353
-#define OVERLAY 354
-#define SWITCHSCREEN 355
-#define SAMESERVER 356
-#define SCREEN 357
-#define LINE 358
-#define PERCENT 359
-#define CONSSCROLL 360
-#define FLOAT 361
 
 
 
+#if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
+typedef union YYSTYPE
+{
 
-#if ! defined (YYSTYPE) && ! defined (YYSTYPE_IS_DECLARED)
+/* Line 1685 of yacc.c  */
 #line 84 "parser.y"
-typedef union YYSTYPE {
+
   int val;
   char *str;
   modmap_t modmap;
   struct xkb_action *action;
   double dbl;
   mergemode mergemode;
+
+
+
+/* Line 1685 of yacc.c  */
+#line 168 "parser.tab.h"
 } YYSTYPE;
-/* Line 1240 of yacc.c.  */
-#line 258 "parser.tab.h"
+# define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
-# define YYSTYPE_IS_TRIVIAL 1
 #endif
 
 extern YYSTYPE yylval;
-
 
 
