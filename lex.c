@@ -3069,8 +3069,10 @@ void yyfree (void * ptr )
 	int
 	yywrap (void)
 	 {
-	   close_include ();
-	   return 0;
+           if (close_include () == 0)
+             return 0;
+           else
+             return 1;
 	 }
 
 	#define	MAX_INCLUDE_DEPTH	50
@@ -3109,15 +3111,14 @@ void yyfree (void * ptr )
   	  yy_switch_to_buffer (buffer);
 	}
 
-	/* Close an includefile.  */
-	void
+	/* Close an includefile. returns 0 on success */
+	int
 	close_include (void)
 	{
 	  if ( --include_stack_ptr < 0 )
 	    {
-	    //	      yyterminate ();
 	      fprintf (stderr, "Unexpected end of file at %s:%d.\n", filename, lineno);
-	      exit (1);
+	      return (1);
 	    }
 	  else
 	    {
@@ -3127,6 +3128,7 @@ void yyfree (void * ptr )
 	      lineno = include_stack[include_stack_ptr].currline;
 	      filename = include_stack[include_stack_ptr].filename;
 	      yy_switch_to_buffer (include_stack[include_stack_ptr].buffer);
+              return (0);
 	    }
 	}
 
