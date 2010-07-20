@@ -3434,3 +3434,15 @@ void yyfree (void * ptr )
  //	   error_at_line (0, 1, filename, lineno, "foo %d\n", 2);
 	}
 
+	int
+	scanner_get_current_location()
+	{
+	  return lineno;
+	}
+
+	const char*
+	scanner_get_current_file()
+	{
+	  return filename;
+	}
+
