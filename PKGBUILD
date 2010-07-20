@@ -41,5 +41,10 @@ build() {
 	# BUILD HERE
 	#
 	make || return 1
+}
+
+package()
+{
+	cd "$srcdir/$_gitname-build"
 	make DESTDIR="$pkgdir/" install
 }
