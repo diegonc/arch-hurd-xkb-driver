@@ -23,7 +23,7 @@
 	#include <stdio.h>
 	#include <error.h>
 
-	void close_include (void);
+	int close_include (void);
 	int lineno = 1;
 	char *filename = "foo";
 
