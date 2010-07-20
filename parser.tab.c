@@ -3701,10 +3701,17 @@ skip_to_sectionname (char *sectionname, int sectionsymbol)
       do 
 	{
 	  symbol = yylex ();
-	} while (symbol != sectionsymbol);
-      symbol = yylex ();
+	} while ((symbol != YY_NULL) && (symbol != sectionsymbol));
 
-      if (symbol != STR)
+      if (symbol != YY_NULL)
+        symbol = yylex ();
+
+      if (symbol == YY_NULL) {
+        char tmpbuf[1024] = 0;
+        snprintf(tmpbuf, 1023, "cannot find section %s", sectionanme);
+        yyerror(tmpbuf);
+        exit(1);
+      } else if (symbol != STR)
 	continue;
 
     } while (strcmp (yylval.str, sectionname));
