@@ -3411,7 +3411,7 @@ void yyfree (void * ptr )
 	  if ( --include_stack_ptr < 0 )
 	    {
 	    //	      yyterminate ();
-	      fprintf (stderr, "Unexpected end of file.\n");
+	      fprintf (stderr, "Unexpected end of file at %s:%d.\n", filename, lineno);
 	      exit (1);
 	    }
 	  else
