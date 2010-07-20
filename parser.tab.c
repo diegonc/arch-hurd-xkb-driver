@@ -4463,7 +4463,7 @@ yyreturn:
 
 /* Skip all tokens until a section of the type SECTIONSYMBOL with the
    name SECTIONNAME is found.  */
-static void
+static int
 skip_to_sectionname (char *sectionname, int sectionsymbol)
 {
   int symbol;
@@ -4479,18 +4479,16 @@ skip_to_sectionname (char *sectionname, int sectionsymbol)
         symbol = yylex ();
 
       if (symbol == YY_NULL) {
-        char tmpbuf[1024] = 0;
-        snprintf(tmpbuf, 1023, "cannot find section %s", sectionanme);
-        yyerror(tmpbuf);
-        exit(1);
+        return 1;
       } else if (symbol != STR)
 	continue;
 
     } while (strcmp (yylval.str, sectionname));
+    return 0;
 }
 
 /* Skip all tokens until the default section is found.  */
-static void
+static int
 skip_to_defaultsection (void)
 {
   int symbol;
@@ -4498,14 +4496,17 @@ skip_to_defaultsection (void)
   /* Search the default section.  */
   do
     {
-      symbol = yylex ();
+      if ((symbol = yylex ()) == YY_NULL)
+          return 1;
     } while (symbol != DEFAULT);
 
   do
     {
-      symbol = yylex ();
+      if ((symbol = yylex ()) == YY_NULL)
+          return 1;
     } while (symbol != '{');
   scanner_unput ('{');
+  return 0;
 }
 
 /* Include a single file. INCL is the filename. SECTIONSYMBOL is the
