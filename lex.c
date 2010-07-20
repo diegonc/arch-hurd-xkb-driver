@@ -1173,7 +1173,7 @@ char *yytext;
 #include <stdlib.h>
 #include <stdio.h>
 #include <error.h>
-void close_include (void);
+int close_include (void);
 int lineno = 1;
 char *filename = "foo";
 #line 1180 "lex.c"
