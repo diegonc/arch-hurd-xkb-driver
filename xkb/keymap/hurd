@@ -5,7 +5,7 @@ xkb_keymap "Hurd" {
     xkb_keycodes	{ include "xfree86"		};
     xkb_types		{ include "default+hurd"	};
     xkb_compatibility	{ include "default"		};
-    xkb_symbols 	{ include "pc(pc105)+hurd+pc104+group(win_switch)+compose(menu)"	};
+    xkb_symbols 	{ include "pc(pc105)+hurd+group(win_switch)+compose(menu)"	};
     xkb_geometry 	{ include "pc"			};
 };
 
