@@ -319,7 +319,10 @@ vmods_def:
 
 /* Return the number of the virtual modifier.  */
 vmod:
-	IDENTIFIER		{ $$ = vmod_find ($1); }
+	IDENTIFIER
+	  { if (!($$ = vmod_find ($1)))
+	      fprintf(stderr, "warning: %s virtual modifier is not defined.", $1);
+	  }
 ;
 
 /* A single realmodifier.  */
