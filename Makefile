@@ -38,3 +38,6 @@ parser.tab.c parser.tab.h:	parser.y
 input_driver_test:	input_driver_test.c
 	$(CC) -rdynamic $(CFLAGS) $(LIBS) -ldl input_driver_test.c -o input_driver_test
 
+parser_test: parser_test.o
+	$(CC) $(CFLAGS) parser_test.o -o parser_test
+
