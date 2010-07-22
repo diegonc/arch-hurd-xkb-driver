@@ -28,13 +28,13 @@
 #include <iconv.h>
 #include <locale.h>
 #include <error.h>
+#include <stdarg.h>
 
 #include "xkb.h"
 #define XK_XKB_KEYS
 #define XK_MISCELLANY
 #include "keysymdef.h"
-#include "driver.h"
-#include "inputdev.h"
+#include <hurd/console.h>
 #include <wctype.h>
 
 
@@ -102,8 +102,50 @@ static int stickykeys_active = 1;
 /* The name of the repeater node.  */
 static char *repeater_node;
 
-/* The repeater node.  */
-static consnode_t cnode;
+/* Enter SIZE bytes from the buffer BUF into the currently active
+   console.  This can be called by the input driver at any time.  */
+error_t console_input (char *buf, size_t size)
+{
+  int i;
+  printf ("Input: ");
+  for (i = 0; i < size; i++)
+    printf ("'%c'(%d)", (unsigned char) buf[i], (unsigned char) buf[i]);
+  printf ("\n");
+  return 0;
+}
+
+#if 0
+/* Scroll the active console by TYPE and VALUE as specified by
+   cons_vcons_scrollback.  */
+int console_scrollback (cons_scroll_t type, float value)
+{
+  printf ("Scrollback: type: %d, amount: %f\n", type, value);
+  return 0;
+}
+#endif
+
+/* Switch the active console to console ID or DELTA (relative to the
+   active console).  */
+error_t console_switch (int id, int delta)
+{
+  printf ("Switch to: %d, delta %d\n", id, delta);
+  return 0;
+}
+
+/* Signal an error to the user.  */
+void console_error (const wchar_t *const err_msg)
+{
+  printf ("Error: %s\n", (char*)err_msg);
+}
+
+//int (* kbd_drv_close)(void);
+
+/* Exit the console client.  Does not return.  */
+void console_exit (void)
+{
+  printf ("Console exit\n");
+  exit (0);
+}
 
 int
 debug_printf (const char *f, ...)
@@ -959,11 +1001,11 @@ action_exec (xkb_action_t *action, keypress_t key)
       }
     case SA_ConsScroll:
       {
-	action_consscroll_t *scrollac = (action_consscroll_t *) action;
+	/*action_consscroll_t *scrollac = (action_consscroll_t *) action;*/
 	
 	if (key.rel)
 	  break;
-
+/*
 	if (scrollac->flags & usePercentage)
 	  console_scrollback (CONS_SCROLL_ABSOLUTE_PERCENTAGE,
 			      100 - scrollac->percent);
@@ -977,6 +1019,7 @@ action_exec (xkb_action_t *action, keypress_t key)
 	      CONS_SCROLL_ABSOLUTE_LINE : CONS_SCROLL_DELTA_LINES;
 	    console_scrollback (type, -scrollac->line);
 	  }
+	  */
 	break;
       }
     case SA_ActionMessage:

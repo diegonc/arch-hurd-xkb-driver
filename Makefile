@@ -38,6 +38,6 @@ parser.tab.c parser.tab.h:	parser.y
 input_driver_test:	input_driver_test.c
 	$(CC) -rdynamic $(CFLAGS) $(LIBS) -ldl input_driver_test.c -o input_driver_test
 
-parser_test: parser_test.o
-	$(CC) $(CFLAGS) parser_test.o -o parser_test
+parser_test: test/parser_test.c compose.o kstoucs.o xkbdata.c test/ihash.c lex.o parser.tab.o symname.o xkbdefaults.o
+	$(CC) $(CFLAGS) -std=gnu99 -I. -Itest test/parser_test.c test/ihash.c xkbdata.c compose.o kstoucs.o symname.o xkbdefaults.o parser.tab.o lex.o -o parser_test
 
