@@ -4806,6 +4806,8 @@ parse_xkbconfig (char *xkbdir, char *xkbkeymapfile, char *xkbkeymap)
 
       if (xkbkeymap)
 	skip_to_sectionname (xkbkeymap, XKBKEYMAP);
+      else
+        skip_to_defaultsection();
     } 
   else /* Use defaults.  */
     {
