@@ -75,7 +75,7 @@ keyname_add (char *keyname, int keycode)
   kn->rmods = 0;
 
   kn_int = keyname[0] + (keyname[1] << 8) + (keyname[2] << 16) + (keyname[3] << 24);
-  debug_printf ("add : %d\n", kn_mapping.locp_offset);
+  debug_printf ("add key %s(%d) hash: %d\n", keyname, keycode, kn_int);
   hurd_ihash_add (&kn_mapping, kn_int, kn);
 
   return 0;
@@ -441,7 +441,7 @@ set_rmod_keycode (char *keyname, int rmod)
 {
   keycode_t kc = keyname_find (keyname);
   keys[kc].mods.rmods = rmod;
-  debug_printf ("kc %d = %d\n", kc, rmod);
+  debug_printf ("%s (kc %d) rmod: %d\n", keyname, kc, rmod);
 }
 
 /* Initialize XKB data structures.  */
