@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -O -g -Wall -D_GNU_SOURCE -D_FILE_OFFSET_BITS=64
+CFLAGS := $(CFLAGS) -Wall -D_GNU_SOURCE -D_FILE_OFFSET_BITS=64
 OBJS =	kstoucs.o symname.o compose.o xkb.o parser.tab.o lex.o \
 	xkbdata.o xkbdefaults.o xkbtimer.o timer.o kbd-repeat.o \
 	kdioctlServer.o
@@ -24,7 +24,7 @@ install: all
 	$(CC) $(CFLAGS) -c $< -o $@
 
 xkb.so.0.3: $(OBJS)
-	$(CC) -O -shared -Wl,-soname=xkb.so.0.3 -std=gnu99 -Wall -g '-Wl,-('   '-Wl,-)' -o xkb.so.0.3 $(OBJS) -lc
+	$(CC) $(CFLAGS) -shared -Wl,-soname=xkb.so.0.3 -std=gnu99 -Wall -g '-Wl,-('   '-Wl,-)' -o xkb.so.0.3 $(OBJS) -lc
 
 clean:
 	-rm -f $(OBJS) xkb.so.*
