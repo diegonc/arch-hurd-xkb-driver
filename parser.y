@@ -78,6 +78,10 @@ mergemode merge_mode = override;
 
 //#define	YYDEBUG	1
 
+#ifndef YY_NULL
+#define YY_NULL 0
+#endif
+
 static struct keytype *current_keytype;
 %}
 
@@ -315,7 +319,10 @@ vmods_def:
 
 /* Return the number of the virtual modifier.  */
 vmod:
-	IDENTIFIER		{ $$ = vmod_find ($1); }
+	IDENTIFIER
+	  { if (!($$ = vmod_find ($1)))
+	      fprintf(stderr, "warning: %s virtual modifier is not defined.", $1);
+	  }
 ;
 
 /* A single realmodifier.  */
@@ -1139,7 +1146,7 @@ geometry:
 %%
 /* Skip all tokens until a section of the type SECTIONSYMBOL with the
    name SECTIONNAME is found.  */
-static void
+static int
 skip_to_sectionname (char *sectionname, int sectionsymbol)
 {
   int symbol;
@@ -1149,17 +1156,22 @@ skip_to_sectionname (char *sectionname, int sectionsymbol)
       do 
 	{
 	  symbol = yylex ();
-	} while (symbol != sectionsymbol);
-      symbol = yylex ();
+	} while ((symbol != YY_NULL) && (symbol != sectionsymbol));
 
-      if (symbol != STR)
+      if (symbol != YY_NULL)
+        symbol = yylex ();
+
+      if (symbol == YY_NULL) {
+        return 1;
+      } else if (symbol != STR)
 	continue;
 
     } while (strcmp (yylval.str, sectionname));
+    return 0;
 }
 
 /* Skip all tokens until the default section is found.  */
-static void
+static int
 skip_to_defaultsection (void)
 {
   int symbol;
@@ -1167,14 +1179,17 @@ skip_to_defaultsection (void)
   /* Search the default section.  */
   do
     {
-      symbol = yylex ();
+      if ((symbol = yylex ()) == YY_NULL)
+          return 1;
     } while (symbol != DEFAULT);
 
   do
     {
-      symbol = yylex ();
+      if ((symbol = yylex ()) == YY_NULL)
+          return 1;
     } while (symbol != '{');
   scanner_unput ('{');
+  return 0;
 }
 
 /* Include a single file. INCL is the filename. SECTIONSYMBOL is the
@@ -1186,9 +1201,15 @@ include_section (char *incl, int sectionsymbol, char *dirname,
 		 mergemode new_mm)
 {
   void include_file (FILE *, mergemode, char *);
+  int scanner_get_current_location ();
+  const char* scanner_get_current_file ();
+
   char *filename;
   char *sectionname = NULL;
   FILE *includefile;
+
+  int current_location = scanner_get_current_location();
+  char* current_file = strdup(scanner_get_current_file());
   
   sectionname = strchr (incl, '(');
   if (sectionname)
@@ -1223,11 +1244,25 @@ include_section (char *incl, int sectionsymbol, char *dirname,
 
   /* If there is a sectionname not the entire file should be included,
      the scanner should be positioned at the required section.  */
+  int err;
   if (sectionname)
-      skip_to_sectionname (sectionname, sectionsymbol);
+      err = skip_to_sectionname (sectionname, sectionsymbol);
   else
-      skip_to_defaultsection ();
+      err = skip_to_defaultsection ();
 
+  if (err != 0) {
+     char* tmpbuf = malloc(sizeof(char)*1024);
+     if (tmpbuf) {
+         snprintf(tmpbuf, 1023, "cannot find section %s in file %s included from %s:%d.\n"
+             , (sectionname ? sectionname : "DEFAULT")
+             , filename, current_file, current_location);
+	 yyerror(tmpbuf);
+	 free(tmpbuf);
+     }
+     free(current_file);
+     exit(err);
+  }
+  free(current_file);
   return 0;
 }
 
