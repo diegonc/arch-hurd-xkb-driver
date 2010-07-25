@@ -168,7 +168,6 @@ read_scancode (void)
 {
   scancode_t sc = 0;
   unsigned char next = 0;
-  kd_event data_buf;
 
   /* GNU Mach v1 does provide keyboard input in a different format.  */
   if (gnumach_v1_compat)
@@ -182,24 +181,15 @@ read_scancode (void)
     {
       /* io_buf_ptr_t is (char *), not (void *).  So I have a few
 	 casts to quiet warnings.  */
-      mach_msg_type_number_t data_cnt = sizeof (data_buf);
+      mach_msg_type_number_t data_cnt = 1;
 
-      error_t err = device_read_inband (kbd_dev, 0, -1, sizeof (kd_event),
-					(void *) &data_buf, &data_cnt);
+      error_t err = device_read_inband (kbd_dev, 0, -1, 1,
+					(void *) &next, &data_cnt);
 
-      if (kbd_repeater_opened && data_buf.type == KEYBD_EVENT)
-	{
-	  kbd_repeat_key (&data_buf);
-	  data_buf.type = 0;
-	  continue;
-	}
-
-      next = data_buf.value.sc;
       /* XXX The error occured likely because KBD_DEV was closed, so
 	 terminate.  */
       if (err)
 	return 0;
-
     }
   while (next == 0xF0);	/* XXX Magic constant.  */
 
