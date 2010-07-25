@@ -1,4 +1,3 @@
-CFLAGS ?= -O0 -g
 CFLAGS := $(CFLAGS) -Wall -D_GNU_SOURCE -D_FILE_OFFSET_BITS=64
 OBJS =	kstoucs.o symname.o compose.o xkb.o parser.tab.o lex.o \
 	xkbdata.o xkbdefaults.o xkbtimer.o timer.o kbd-repeat.o \
