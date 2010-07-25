@@ -1,5 +1,5 @@
-/* inputdev.h - Interfaces for the PC pc-kbd and mouse input drivers.
-   Copyright (C) 2002, 2004 Free Software Foundation, Inc.
+/* mach-inputdev.h - Interfaces for the PC pc-kbd and mouse input drivers.
+   Copyright (C) 2002, 2004, 2005 Free Software Foundation, Inc.
    Written by Marco Gerards.
 
    This file is part of the GNU Hurd.
@@ -50,7 +50,7 @@
 #ifndef _INPUTDEV_H_
 #define _INPUTDEV_H_ 1
 
-#include "trans.h"
+#include <trans.h>
 
 typedef u_short kev_type;               /* kd event type */
 

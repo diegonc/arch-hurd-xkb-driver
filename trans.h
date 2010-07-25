@@ -1,5 +1,5 @@
 /* trans.h -- Control a translator node for the repeaters.
-   Copyright (C) 2004 Free Software Foundation, Inc.
+   Copyright (C) 2004, 2005 Free Software Foundation, Inc.
    Written by Marco Gerards.
 
    This program is free software; you can redistribute it and/or
@@ -54,15 +54,28 @@ struct consnode
   /* The demuxer used for this node.  */
   int (*demuxer) (mach_msg_header_t *inp, mach_msg_header_t *outp);
 
+  /* Called when the symlink is read */
+  error_t (*readlink) (struct iouser *user, struct node *np, char *buf);
+
+  /* Called when the symlink is written */
+  error_t (*mksymlink) (struct iouser *cred, struct node *np, char *name);
+  
   struct consnode *next;
 };
 
 typedef struct consnode *consnode_t;
 
+/* Register the node CN with the translator.  */
 void console_register_consnode (consnode_t cn);
 
-void console_unregister_consnode (consnode_t node);
+/* Unregister the node CN from the translator.  */
+void console_unregister_consnode (consnode_t cn);
 
+/* Create a node with the name NAME and return it in *CN.  */
 error_t console_create_consnode (const char *name, consnode_t *cn);
 
+/* Destroy the node CN.  */
 void console_destroy_consnode (consnode_t cn);
+
+/* Setup the translator for console client nodes on PATH.  */
+error_t console_setup_node (char *path);
