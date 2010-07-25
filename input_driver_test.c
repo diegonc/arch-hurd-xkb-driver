@@ -76,6 +76,16 @@ error_t console_switch (int id, int delta)
   return 0;
 }
 
+void console_switch_back(void)
+{
+  printf ("Switch back\n");
+}
+
+void console_switch_away(void)
+{
+  printf ("Switch away\n");
+}
+
 /* Signal an error to the user.  */
 void console_error (const wchar_t *const err_msg)
 {
