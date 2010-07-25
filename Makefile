@@ -1,4 +1,5 @@
-CFLAGS = -O -g -Wall -D_GNU_SOURCE -D_FILE_OFFSET_BITS=64
+CFLAGS = -O -g -Wall -D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 -I. \
+	 -std=gnu99 -fgnu89-inline
 OBJS =	kstoucs.o symname.o compose.o xkb.o parser.tab.o lex.o \
 	xkbdata.o xkbdefaults.o xkbtimer.o timer.o kbd-repeat.o \
 	kdioctlServer.o
@@ -34,8 +35,8 @@ lex.c:	lex.l parser.tab.h
 parser.tab.c parser.tab.h:	parser.y
 	$(YACC) -v -d $<
 
-input_driver_test:	input_driver_test.c
-	$(CC) -rdynamic $(CFLAGS) $(LIBS) -ldl input_driver_test.c -o input_driver_test
+input_driver_test:	input_driver_test.c trans.o
+	$(CC) -rdynamic $(CFLAGS) $(LIBS) -ldl input_driver_test.c trans.o -o input_driver_test
 
 kbd-repeat.o: kdioctl_S.h
 
