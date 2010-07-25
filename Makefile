@@ -37,6 +37,8 @@ parser.tab.c parser.tab.h:	parser.y
 input_driver_test:	input_driver_test.c
 	$(CC) -rdynamic $(CFLAGS) $(LIBS) -ldl input_driver_test.c -o input_driver_test
 
+kbd-repeat.o: kdioctl_S.h
+
 
 ## TODO include Makeconf and config.make?
 # How to run compilation tools.
