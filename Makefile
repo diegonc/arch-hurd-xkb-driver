@@ -2,7 +2,7 @@ CFLAGS = -O -g -Wall -D_GNU_SOURCE -D_FILE_OFFSET_BITS=64
 OBJS =	kstoucs.o symname.o compose.o xkb.o parser.tab.o lex.o \
 	xkbdata.o xkbdefaults.o xkbtimer.o timer.o kbd-repeat.o \
 	kdioctlServer.o
-LIBS = -lthreads -lshouldbeinlibc -lfshelp -liohelp
+LIBS = -lthreads -lshouldbeinlibc -lfshelp -liohelp -lnetfs
 LEX=flex
 YACC=bison
 
