@@ -322,6 +322,8 @@ vmod:
 	IDENTIFIER
 	  { if (!($$ = vmod_find ($1)))
 	      fprintf(stderr, "warning: %s virtual modifier is not defined.", $1);
+            else
+              $$ = 1 << ($$ - 1);
 	  }
 ;
 
