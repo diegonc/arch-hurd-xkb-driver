@@ -2,7 +2,7 @@
 
 # vim: set ts=4 noet sw=4:
 
-pkgname=console-driver-xkb
+pkgname=console-driver-xkb-git
 pkgver=0.008
 pkgrel=1
 pkgdesc="An input driver for the console that supports XKB layouts."
