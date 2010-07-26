@@ -162,11 +162,17 @@ debug_printf (const char *f, ...)
   return ret;  
 }
 
+/* reads scancodes from standard input. */
 scancode_t
 read_scancode (void)
 {
   scancode_t sc = 0;
+  unsigned char next = 0;
 
+  if (fread(&next, 1, 1, stdin) != 1)
+    console_exit();
+
+  sc |= next;
   return sc;
 }
 
@@ -1458,7 +1464,51 @@ xkb_input (keypress_t key)
   size = 0;
 }
 
+void
+input_loop ()
+{
+  keycode_t prevkey = 0;
 
+  for (;;)
+  {
+    /* The previous keypress.  */
+    //  static keypress_t prevkey = { 0 };
+    keypress_t key;
+
+    key.keycode = read_keycode () + min_keys;
+    key.rel = key.keycode & 0x80;
+    key.redir = 0;
+
+    /*       if (key.keycode == 9) */
+    /* 	console_exit (); */
+
+    //      printf ("read keycode: %d\n", key.keycode);
+
+    if (!key.rel && key.keycode == prevkey)
+      key.repeat = 1;
+    else
+      key.repeat = 0;
+
+    if (key.repeat)
+      continue;
+
+    /* The keycombination CTRL+Alt+Backspace terminates the console
+       client. Keycodes instead of modifiers+symbols are used to
+       make it able to exit the client, even when the keymaps are
+       faulty.  */
+    if ((keystate[64].keypressed || keystate[113].keypressed) /* Alt */
+        && (keystate[37].keypressed || keystate[109].keypressed) /* CTRL*/
+        && keystate[22].keypressed && ctrlaltbs) /* Backspace.  */
+      console_exit ();
+
+    debug_printf ("---%d %d %d---\n", keystate[64].keypressed,
+        keystate[37].keypressed, keystate[22].keypressed);
+
+    if (!key.repeat)
+      xkb_input_key (key.keycode);
+    prevkey = key.keycode;
+  }
+}
 
 static struct arguments
 {
@@ -1539,6 +1589,18 @@ parse_opt (int key, char *arg, struct argp_state *state)
 
 static struct argp argp = {options, parse_opt, 0, 0};
 
+error_t
+start()
+{
+  cd = iconv_open("UTF-8", "WCHAR_T");
+  if (cd == (iconv_t) -1)
+    return errno;
+
+  input_loop();
+  iconv_close(cd);
+  return 0;
+}
+
 int main (int argc, char **argv)
 {
   error_t err;
@@ -1577,6 +1639,8 @@ int main (int argc, char **argv)
 
   determine_keytypes ();
   interpret_all ();
+
+  start();
 
   return 0;
 }
