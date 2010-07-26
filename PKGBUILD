@@ -17,7 +17,7 @@ source=()
 
 _gitroot=git://github.com/diegonc/arch-hurd-xkb-driver.git
 _gitname=xkb-driver-git
-_gitbranch=
+_gitbranch="--branch update-xkb-parser"
 
 build() {
 	cd "$srcdir"
