@@ -1,4 +1,4 @@
-# Maintainer:
+# Contributor: Diego Nieto Cid <dnietoc@gmail.com>
 
 # vim: set ts=4 noet sw=4:
 
