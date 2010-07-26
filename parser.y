@@ -266,6 +266,7 @@ keycodesect:
 | "minimum" '=' NUM ';' keycodesect
    { 
      min_keys = $3;
+     debug_printf("working on key: %d\n", $3);
      current_key = &keys[$3];
    }
 | MAXIMUM '=' NUM ';' keycodesect 
@@ -1053,7 +1054,7 @@ symbolssect:
    { include_sections ($3, XKBSYMBOLS, "symbols", $2) }
   symbolinclude
 | symbolssect actiondef
-| symbolssect "key" '.' {current_key = default_key } keydesc ';'
+| symbolssect "key" '.' {debug_printf("working on default key.\n"); current_key = default_key } keydesc ';'
 | symbolssect error ';' { yyerror ("Error in symbol section\n") }
 ;
 
@@ -1243,7 +1244,7 @@ include_section (char *incl, int sectionsymbol, char *dirname,
     }
   
   include_file (includefile, new_mm, strdup (filename));
-
+  debug_printf("skipping to section %s\n", (sectionname ? sectionname : "default"));
   /* If there is a sectionname not the entire file should be included,
      the scanner should be positioned at the required section.  */
   int err;
@@ -1379,10 +1380,12 @@ key_set_keysym (struct key *key, group_t group, int level, symbol ks)
     }
   else
     /* For NoSymbol leave the old symbol intact.  */
-    if (!ks)
+    if (!ks) {
+      debug_printf("symbol %d was not added to key.", ks);
       return;
+    }
 
-     
+  debug_printf("symbol '%c'(%d) added to key for group %d and level %d.\n", ks, ks, group, level);
   keysyms[level++] = ks;
 }
 
@@ -1449,6 +1452,7 @@ key_new (char *keyname)
       if (!isempty ((char *) &keys[kc], sizeof (struct key)))
 	{
 	  current_key = &dummy_key;
+          debug_printf ("working on dummy key due to merge mode.\n");
 	  return;
 	}
       else
@@ -1464,8 +1468,11 @@ key_new (char *keyname)
       current_key = &keys[kc];
     }
 
+  debug_printf("working on key %s(%d)", keyname, kc);
+
   if (current_key->numgroups == 0 || merge_mode == replace)
     {
+      debug_printf(" cloned default key");
       /* Clone the default key.  */
       memcpy (current_key, default_key, sizeof (struct key));
       for (group = 0; group < 3; group++)
@@ -1476,6 +1483,7 @@ key_new (char *keyname)
 	  current_key->groups[group].width = 0;
 	}
     }
+  debug_printf("\n");
 }
 
 /* Load the XKB configuration from the section XKBKEYMAP in the
