@@ -168,7 +168,6 @@ xkb_input_key (int key)
   int keyc = key & 127;
   debug_printf ("KEYIN: %d\n", key);
 
-#if 0
   /* Filter out any double or disabled keys.  */
   if (key == lastkey || keystate[keyc].disabled)
     return 0;
@@ -176,13 +175,14 @@ xkb_input_key (int key)
   /* Always handle keyrelease events.  */
   if (!pressed)
     {
+#if 0
       /* Stop the timer for this released key.  */
       if (per_key_timers[keyc].enable_status != timer_stopped)
 	{
 	  timer_remove (&per_key_timers[keyc].enable_timer);
 	  per_key_timers[keyc].enable_status = timer_stopped;
 	}
-
+#endif
       /* No more last key; it was released.  */
       if (keyc == lastkey)
 	lastkey = 0;
@@ -191,7 +191,7 @@ xkb_input_key (int key)
 	 not have been accepted.  */
       if (keystate[key & 127].keypressed)
 	xkb_handle_key (key);
-
+#if 0
       /* If bouncekeys is active, disable the key.  */
       if (bouncekeys_active)
 	{
@@ -205,13 +205,15 @@ xkb_input_key (int key)
 	    = fetch_jiffies () + bouncekeys_delay;
 	  timer_add (&per_key_timers[keyc].disable_timer);
 	}
-
+#endif
       return 0;
     }
-
+#if 0
   /* Setup the timer for slowkeys.  */
   timer_clear (&per_key_timers[keyc].enable_timer);
+#endif
   lastkey = keyc;
+#if 0
   per_key_timers[keyc].enable_timer.fnc = key_timing;
   per_key_timers[keyc].enable_timer.fnc_data = (void *) keyc;
 
