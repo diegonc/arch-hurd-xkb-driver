@@ -5,7 +5,7 @@ xkb_keymap "Hurd" {
     xkb_keycodes	{ include "xfree86"		};
     xkb_types		{ include "default+hurd"	};
     xkb_compatibility	{ include "default"		};
-    xkb_symbols 	{ include "pc(pc105)+hurd+group(win_switch)+compose(menu)"	};
+    xkb_symbols 	{ include "pc(pc105)+us+hurd+group(win_switch)+compose(menu)"	};
     xkb_geometry 	{ include "pc"			};
 };
 
@@ -13,7 +13,7 @@ default xkb_keymap "us" {
     xkb_keycodes	{ include "xfree86"		};
     xkb_types		{ include "default+hurd"		};
     xkb_compatibility	{ include "default"		};
-    xkb_symbols		{ include "pc(pc105)+hurd"		};
+    xkb_symbols		{ include "pc(pc105)+us+hurd"		};
     xkb_geometry	{ include "pc"			};
 };
 
@@ -96,7 +96,7 @@ xkb_keymap "en_US" {
     xkb_keycodes	{ include "xfree86"		};
     xkb_types		{ include "default"		};
     xkb_compatibility	{ include "default"		};
-    xkb_symbols 	{ include "pc(pc105)"	};
+    xkb_symbols 	{ include "pc(pc105)+us"	};
     xkb_geometry 	{ include "pc"			};
 };
 xkb_keymap "es"	{
