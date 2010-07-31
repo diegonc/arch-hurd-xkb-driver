@@ -38,6 +38,7 @@
 #include "keysymdef.h"
 #include "driver.h"
 #include "inputdev.h"
+#include <wctype.h>
 
 
 /* The keyboard device in the kernel.  */
@@ -104,7 +105,9 @@ static xkb_indicator_t *indicators;
 static int indicator_count;
 static int indicator_map = 0;
 
+/* unused
 static int stickykeys_active = 1;
+*/
 
 /* The name of the repeater node.  */
 static char *repeater_node;
@@ -116,7 +119,7 @@ int
 debug_printf (const char *f, ...)
 {
   va_list ap;
-  int ret;
+  int ret = 0;
 
   va_start (ap, f);
 #ifdef XKB_DEBUG  
@@ -164,7 +167,7 @@ scancode_t
 read_scancode (void)
 {
   scancode_t sc = 0;
-  unsigned char next;
+  unsigned char next = 0;
   kd_event data_buf;
 
   /* GNU Mach v1 does provide keyboard input in a different format.  */
@@ -1712,7 +1715,6 @@ static error_t
 xkb_init (void **handle, int no_exit, int argc, char **argv, int *next)
 {
   error_t err;
-  int lastarg;
 
   setlocale(LC_ALL, "");
   
