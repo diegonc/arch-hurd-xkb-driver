@@ -1,1 +1,7 @@
 *.o
+lex.c
+parser.tab.h
+parser.tab.c
+parser.output
+xkb.so.0.3
+input_driver_test
