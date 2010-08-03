@@ -78,6 +78,10 @@ mergemode merge_mode = override;
 
 //#define	YYDEBUG	1
 
+#ifndef YY_NULL
+#define YY_NULL 0
+#endif
+
 static struct keytype *current_keytype;
 %}
 
@@ -262,6 +266,7 @@ keycodesect:
 | "minimum" '=' NUM ';' keycodesect
    { 
      min_keys = $3;
+     debug_printf("working on key: %d\n", $3);
      current_key = &keys[$3];
    }
 | MAXIMUM '=' NUM ';' keycodesect 
@@ -318,6 +323,8 @@ vmod:
 	IDENTIFIER
 	{ if (($$ = vmod_find ($1)) != 0)
 	    $$ = 1 << ($$ - 1);
+	  else
+	    fprintf(stderr, "warning: %s virtual modifier is not defined.", $1);
 	}
 ;
 
@@ -1047,7 +1054,7 @@ symbolssect:
    { include_sections ($3, XKBSYMBOLS, "symbols", $2) }
   symbolinclude
 | symbolssect actiondef
-| symbolssect "key" '.' {current_key = default_key } keydesc ';'
+| symbolssect "key" '.' {debug_printf("working on default key.\n"); current_key = default_key } keydesc ';'
 | symbolssect error ';' { yyerror ("Error in symbol section\n") }
 ;
 
@@ -1142,7 +1149,7 @@ geometry:
 %%
 /* Skip all tokens until a section of the type SECTIONSYMBOL with the
    name SECTIONNAME is found.  */
-static void
+static int
 skip_to_sectionname (char *sectionname, int sectionsymbol)
 {
   int symbol;
@@ -1152,17 +1159,22 @@ skip_to_sectionname (char *sectionname, int sectionsymbol)
       do 
 	{
 	  symbol = yylex ();
-	} while (symbol != sectionsymbol);
-      symbol = yylex ();
+	} while ((symbol != YY_NULL) && (symbol != sectionsymbol));
 
-      if (symbol != STR)
+      if (symbol != YY_NULL)
+        symbol = yylex ();
+
+      if (symbol == YY_NULL) {
+        return 1;
+      } else if (symbol != STR)
 	continue;
 
     } while (strcmp (yylval.str, sectionname));
+    return 0;
 }
 
 /* Skip all tokens until the default section is found.  */
-static void
+static int
 skip_to_defaultsection (void)
 {
   int symbol;
@@ -1170,14 +1182,17 @@ skip_to_defaultsection (void)
   /* Search the default section.  */
   do
     {
-      symbol = yylex ();
+      if ((symbol = yylex ()) == YY_NULL)
+          return 1;
     } while (symbol != DEFAULT);
 
   do
     {
-      symbol = yylex ();
+      if ((symbol = yylex ()) == YY_NULL)
+          return 1;
     } while (symbol != '{');
   scanner_unput ('{');
+  return 0;
 }
 
 /* Include a single file. INCL is the filename. SECTIONSYMBOL is the
@@ -1189,9 +1204,15 @@ include_section (char *incl, int sectionsymbol, char *dirname,
 		 mergemode new_mm)
 {
   void include_file (FILE *, mergemode, char *);
+  int scanner_get_current_location ();
+  const char* scanner_get_current_file ();
+
   char *filename;
   char *sectionname = NULL;
   FILE *includefile;
+
+  int current_location = scanner_get_current_location();
+  char* current_file = strdup(scanner_get_current_file());
   
   sectionname = strchr (incl, '(');
   if (sectionname)
@@ -1223,14 +1244,28 @@ include_section (char *incl, int sectionsymbol, char *dirname,
     }
   
   include_file (includefile, new_mm, strdup (filename));
-
+  debug_printf("skipping to section %s\n", (sectionname ? sectionname : "default"));
   /* If there is a sectionname not the entire file should be included,
      the scanner should be positioned at the required section.  */
+  int err;
   if (sectionname)
-      skip_to_sectionname (sectionname, sectionsymbol);
+      err = skip_to_sectionname (sectionname, sectionsymbol);
   else
-      skip_to_defaultsection ();
+      err = skip_to_defaultsection ();
 
+  if (err != 0) {
+     char* tmpbuf = malloc(sizeof(char)*1024);
+     if (tmpbuf) {
+         snprintf(tmpbuf, 1023, "cannot find section %s in file %s included from %s:%d.\n"
+             , (sectionname ? sectionname : "DEFAULT")
+             , filename, current_file, current_location);
+	 yyerror(tmpbuf);
+	 free(tmpbuf);
+     }
+     free(current_file);
+     exit(err);
+  }
+  free(current_file);
   return 0;
 }
 
@@ -1345,10 +1380,12 @@ key_set_keysym (struct key *key, group_t group, int level, symbol ks)
     }
   else
     /* For NoSymbol leave the old symbol intact.  */
-    if (!ks)
+    if (!ks) {
+      debug_printf("symbol %d was not added to key.", ks);
       return;
+    }
 
-     
+  debug_printf("symbol '%c'(%d) added to key for group %d and level %d.\n", ks, ks, group, level);
   keysyms[level++] = ks;
 }
 
@@ -1415,6 +1452,7 @@ key_new (char *keyname)
       if (!isempty ((char *) &keys[kc], sizeof (struct key)))
 	{
 	  current_key = &dummy_key;
+          debug_printf ("working on dummy key due to merge mode.\n");
 	  return;
 	}
       else
@@ -1430,8 +1468,11 @@ key_new (char *keyname)
       current_key = &keys[kc];
     }
 
+  debug_printf("working on key %s(%d)", keyname, kc);
+
   if (current_key->numgroups == 0 || merge_mode == replace)
     {
+      debug_printf(" cloned default key");
       /* Clone the default key.  */
       memcpy (current_key, default_key, sizeof (struct key));
       for (group = 0; group < 3; group++)
@@ -1442,6 +1483,7 @@ key_new (char *keyname)
 	  current_key->groups[group].width = 0;
 	}
     }
+  debug_printf("\n");
 }
 
 /* Load the XKB configuration from the section XKBKEYMAP in the
