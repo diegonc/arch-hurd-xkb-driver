@@ -78,6 +78,10 @@ mergemode merge_mode = override;
 
 //#define	YYDEBUG	1
 
+#ifndef YY_NULL
+#define YY_NULL 0
+#endif
+
 static struct keytype *current_keytype;
 %}
 
