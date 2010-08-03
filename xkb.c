@@ -120,7 +120,7 @@ debug_printf (const char *f, ...)
 
   va_start (ap, f);
 #ifdef XKB_DEBUG  
-  ret = printf (f, ap);
+  ret = vfprintf (stderr, f, ap);
 #endif
   va_end (ap);
 
