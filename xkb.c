@@ -1737,7 +1737,7 @@ xkb_init (void **handle, int no_exit, int argc, char **argv, int *next)
   /* Defaults. */
   if (!arguments.xkbdir)
     {
-      arguments.xkbdir = "/usr/share/X11/xkb";
+      arguments.xkbdir = "/share/X11/xkb";
       arguments.keymapfile = "keymap/hurd";
     }
     

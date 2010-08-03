@@ -9,7 +9,7 @@ YACC=bison
 
 # Where to put library and xkb files
 LIB	= $(DESTDIR)/lib/hurd/console/
-XKB	= $(DESTDIR)/usr/share/X11/xkb
+XKB	= $(DESTDIR)/share/X11/xkb
 
 all: xkb.so.0.3 input_driver_test
 
