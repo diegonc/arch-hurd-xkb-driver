@@ -55,7 +55,7 @@ keyname_hash(char *keyname)
 {
   char tmp[5] = {0, 0, 0, 0, 0};
   strncpy(tmp, keyname, 4);
-	return tmp[0] + (tmp[1] << 8) + (tmp[2] << 16) + (tmp[3] << 24);
+  return tmp[0] + (tmp[1] << 8) + (tmp[2] << 16) + (tmp[3] << 24);
 }
 
 /* Assign the name KEYNAME to the keycode KEYCODE.  */
