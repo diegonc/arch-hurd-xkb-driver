@@ -78,12 +78,12 @@ error_t console_switch (int id, int delta)
 
 void console_switch_back(void)
 {
-  puts("Switch back\n");
+  printf ("Switch back\n");
 }
 
 void console_switch_away(void)
 {
-  puts("Switch away\n");
+  printf ("Switch away\n");
 }
 
 /* Signal an error to the user.  */
