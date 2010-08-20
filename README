@@ -56,6 +56,12 @@ Run "make" to compile it. This will result in xkb.so.0.3, the actual
 plugin. Copy this file to the console-client driver directory (For the
 current Hurd version this is /lib/hurd/console).
 
+In Debian GNU/Hurd: 
+
+$ apt-get install gcc bison flex mig xkb-data
+$ make
+$ cp xkb.so.0.3 /usr/lib/hurd/console/
+
 --
 
 Using it:
