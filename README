@@ -74,7 +74,7 @@ You can replace "pc_kbd" in your console client startup line with
 non-default configuration these options exists:
 
 --xkbdir : The root directory of the xkb configuration, by default
- this is /etc/X11/xkb.
+ this is /usr/share/X11/xkb.
 
 --keymapfile : The file that hold the descriptions of the default
  keymaps file. This file holds the description of all keymaps. This
