@@ -1369,7 +1369,7 @@ key_set_keysym (struct key *key, group_t group, int level, symbol ks)
     {
       keysyms = realloc (keysyms, level + 1);
 
-      if (!keys)
+      if (!keysyms)
 	{
 	  fprintf (stderr, "No mem\n");
 	  exit (EXIT_FAILURE);
