@@ -57,6 +57,13 @@ xkb_keymap "cz" {
     xkb_symbols		{ include "pc(pc105)+cz+hurd"	};
     xkb_geometry	{ include "pc"			};
 };
+xkb_keymap "neo"	{
+    xkb_keycodes	{ include "xfree86"		};
+    xkb_types		{ include "default+level5+hurd"	};
+    xkb_compatibility	{ include "default+caps+misc+level5"		};
+    xkb_symbols		{ include "pc(pc105)+de(neo_base)+level3+level5+shift+hurd"	};
+    xkb_geometry 	{ include "pc(pc102)"		};
+};
 xkb_keymap "de"	{
     xkb_keycodes	{ include "xfree86"		};
     xkb_types		{ include "default+hurd"	};
