@@ -101,8 +101,8 @@ static int MouseKeys = 0;
 /* Default mousebutton. */
 static int default_button = 0;
 
-xkb_indicator_t *indicators;
-int indicator_count;
+static xkb_indicator_t *indicators;
+static int indicator_count;
 static int indicator_map = 0;
 
 /* unused
@@ -123,7 +123,7 @@ debug_printf (const char *f, ...)
 
   va_start (ap, f);
 #ifdef XKB_DEBUG  
-  ret = printf (f, ap);
+  ret = vfprintf (stderr, f, ap);
 #endif
   va_end (ap);
 
@@ -1065,7 +1065,6 @@ action_exec (xkb_action_t *action, keypress_t key)
     case SA_RedirectKey:
       {
 	action_redirkey_t *redirkeyac = (action_redirkey_t *) action;	    
-	keypress_t key;
 	
 	key.keycode = redirkeyac->newkey & (key.rel ? 0x80:0);
 	
@@ -1738,6 +1737,9 @@ xkb_init (void **handle, int no_exit, int argc, char **argv, int *next)
   if (!arguments.xkbdir)
     {
       arguments.xkbdir = "/share/X11/xkb";
+    }
+  if (!arguments.keymapfile)
+    {
       arguments.keymapfile = "keymap/hurd";
     }
     

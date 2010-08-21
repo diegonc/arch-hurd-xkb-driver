@@ -321,11 +321,11 @@ vmods_def:
 /* Return the number of the virtual modifier.  */
 vmod:
 	IDENTIFIER
-	  { if (!($$ = vmod_find ($1)))
-	      fprintf(stderr, "warning: %s virtual modifier is not defined.", $1);
-            else
-              $$ = 1 << ($$ - 1);
-	  }
+	{ if (($$ = vmod_find ($1)) != 0)
+	    $$ = 1 << ($$ - 1);
+	  else
+	    fprintf(stderr, "warning: %s virtual modifier is not defined.", $1);
+	}
 ;
 
 /* A single realmodifier.  */
@@ -1369,7 +1369,7 @@ key_set_keysym (struct key *key, group_t group, int level, symbol ks)
     {
       keysyms = realloc (keysyms, level + 1);
 
-      if (!keys)
+      if (!keysyms)
 	{
 	  fprintf (stderr, "No mem\n");
 	  exit (EXIT_FAILURE);
