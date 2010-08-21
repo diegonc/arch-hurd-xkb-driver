@@ -1367,7 +1367,7 @@ key_set_keysym (struct key *key, group_t group, int level, symbol ks)
 
   if ((level + 1) > key->groups[group].width)
     {
-      keysyms = realloc (keysyms, level + 1);
+      keysyms = realloc (keysyms, (level + 1)*sizeof(symbol));
 
       if (!keysyms)
 	{
