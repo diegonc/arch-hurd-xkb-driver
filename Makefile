@@ -1,5 +1,5 @@
 CFLAGS = -O -g -Wall -D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 -I. \
-	 -std=gnu99 -fgnu89-inline
+	 -std=gnu99 -fgnu89-inline -DXKB_DEBUG -g
 OBJS =	kstoucs.o symname.o compose.o xkb.o parser.tab.o lex.o \
 	xkbdata.o xkbdefaults.o xkbtimer.o timer.o kbd-repeat.o \
 	kdioctlServer.o
