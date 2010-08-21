@@ -1402,7 +1402,7 @@ key_set_action (struct key *key, group_t group, int level, xkb_action_t *action)
       /* Previous levels have no actions defined.  */
       memset (&actions[level - 1], 0, (level - width)*sizeof(xkb_action_t *));
 
-      if (!keys)
+      if (!actions)
 	{
 	  fprintf (stderr, "No mem\n");
 	  exit (EXIT_FAILURE);
