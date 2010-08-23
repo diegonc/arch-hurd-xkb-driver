@@ -18,8 +18,10 @@ stdio_read_loop()
 {
   int c;
 
-  while ( (c = getc(stdin)) != EOF )
+  while ( (c = getc(stdin)) != EOF ) {
     putc(c, stdout);
+    fflush(stdout);
+  }
   
   exit(0);
 }
@@ -393,6 +395,7 @@ emit_at_scancodes(struct input_event ev)
     putc(0xE0, stdout);
 
   putc(sc, stdout);
+  fflush(stdout);
 }
 
 int
