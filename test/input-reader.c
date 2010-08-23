@@ -144,9 +144,9 @@ emit_at_scancodes(struct input_event ev)
       sc = ev.code;
       break;
     case KEY_ZENKAKUHANKAKU:
-    case KEY_102ND:
       /* none ? */
       return;
+    case KEY_102ND:
     case KEY_F11:
     case KEY_F12:
       sc = ev.code;
@@ -173,7 +173,8 @@ emit_at_scancodes(struct input_event ev)
       sc = 0x35;
       break;
     case KEY_SYSRQ:
-      
+      /* none ? */
+      return;
     case KEY_RIGHTALT:
       extended = 1;
       sc = 0x38;
