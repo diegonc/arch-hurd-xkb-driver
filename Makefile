@@ -100,3 +100,5 @@ $(mig-sheader-prefix)%_S.h %Server.c: %.sdefsi
 parser_test: test/parser_test.c compose.o kstoucs.o xkbdata.c test/ihash.c lex.o parser.tab.o symname.o xkbdefaults.o test/xkbtimer.c
 	$(CC) $(CFLAGS) -std=gnu99 -I. -Itest test/parser_test.c test/xkbtimer.c test/ihash.c xkbdata.c compose.o kstoucs.o symname.o xkbdefaults.o parser.tab.o lex.o -o parser_test
 
+input-reader: test/input-reader.c
+	$(CC) $(CFLAGS) -o $@ $<
