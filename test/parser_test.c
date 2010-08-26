@@ -1562,9 +1562,9 @@ static struct argp_option options[] = {
   {"no-ctrlaltbs",  'n', 0	    , 0,
    "CTRL + Alt + Backspace will not exit the console client."},
   {"repeat-delay", REPEAT_DELAY_ID, "DELAY", 0,
-   "delay before pressed key starts repeating. (ms)"},
+   "delay before pressed key starts repeating. (ms?)"},
   {"repeat-interval", REPEAT_INTERVAL_ID, "INTERVAL", 0,
-   "time elapsed between repeated keys. (ms)"},
+   "time elapsed between repeated keys. (ms?)"},
   {"repeat",		'r', "NODE", 0, "Set a repeater translator on NODE"},
   {0}
 };
@@ -1661,7 +1661,7 @@ int main (int argc, char **argv)
     }
   if (arguments.repeat_delay < 0)
     {
-      arguments.repeat_delay = 100;
+      arguments.repeat_delay = 50;
     }
   if (arguments.repeat_interval < 0)
     {
