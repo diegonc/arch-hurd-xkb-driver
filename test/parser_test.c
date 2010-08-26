@@ -1543,6 +1543,9 @@ static struct arguments
 
 error_t parse_xkbconfig (char *xkbdir, char *xkbkeymapfile, char *xkbkeymap);
 
+#define REPEAT_DELAY_ID 25425
+#define REPEAT_INTERVAL_ID 5322
+
 /* const char *argp_program_version = "XKB plugin 0.003"; */
 /* const char *argp_program_bug_address = "metgerards@student.han.nl"; */
 static struct argp_option options[] = {
@@ -1558,9 +1561,9 @@ static struct argp_option options[] = {
    "CTRL + Alt + Backspace will exit the console client (default)."},
   {"no-ctrlaltbs",  'n', 0	    , 0,
    "CTRL + Alt + Backspace will not exit the console client."},
-  {"repeat-delay", 'd', "DELAY", 0,
+  {"repeat-delay", REPEAT_DELAY_ID, "DELAY", 0,
    "delay before pressed key starts repeating. (ms)"},
-  {"repeat-interval", 'i', "INTERVAL", 0,
+  {"repeat-interval", REPEAT_INTERVAL_ID, "INTERVAL", 0,
    "time elapsed between repeated keys. (ms)"},
   {"repeat",		'r', "NODE", 0, "Set a repeater translator on NODE"},
   {0}
@@ -1597,11 +1600,11 @@ parse_opt (int key, char *arg, struct argp_state *state)
       arguments->ctrlaltbs = 0;
       break;
 
-    case 'd':
+    case REPEAT_DELAY_ID:
       arguments->repeat_delay = atoi(arg);
       break;
 
-    case 'i':
+    case REPEAT_INTERVAL_ID:
       arguments->repeat_interval = atoi(arg);
       break;
 
