@@ -1643,8 +1643,10 @@ static struct arguments
   char *keymap;
   char *composefile;
   int ctrlaltbs;
+  int repeat_delay;
+  int repeat_interval;
   int pos;
-} arguments = { ctrlaltbs: 1 };
+} arguments = { ctrlaltbs: 1, repeat_delay: -1, repeat_interval: -1 };
 
 error_t parse_xkbconfig (char *xkbdir, char *xkbkeymapfile, char *xkbkeymap);
 
@@ -1667,6 +1669,10 @@ static struct argp_option options[] = {
    "CTRL + Alt + Backspace will exit the console client (default)."},
   {"no-ctrlaltbs",  'n', 0	    , 0,
    "CTRL + Alt + Backspace will not exit the console client."},
+  {"repeat-delay", 'd', "DELAY", 0,
+   "delay before pressed key starts repeating. (ms)"},
+  {"repeat-interval", 'i', "INTERVAL", 0,
+   "time elapsed between repeated keys. (ms)"},
   {"repeat",		'r', "NODE", 0, "Set a repeater translator on NODE"},
   {0}
 };
@@ -1701,7 +1707,15 @@ parse_opt (int key, char *arg, struct argp_state *state)
     case 'n':
       arguments->ctrlaltbs = 0;
       break;
-      
+
+    case 'd':
+      arguments->repeat_delay = atoi(arg);
+      break;
+
+    case 'i':
+      arguments->repeat_interval = atoi(arg);
+      break;
+
     case 'r':
       repeater_node = arg;
       break;
@@ -1741,6 +1755,14 @@ xkb_init (void **handle, int no_exit, int argc, char **argv, int *next)
   if (!arguments.keymapfile)
     {
       arguments.keymapfile = "keymap/hurd";
+    }
+  if (arguments.repeat_delay < 0)
+    {
+      arguments.repeat_delay = 100;
+    }
+  if (arguments.repeat_interval < 0)
+    {
+      arguments.repeat_interval = 10;
     }
     
   ctrlaltbs = arguments.ctrlaltbs;
@@ -1789,7 +1811,7 @@ xkb_start (void *handle)
   if (cd == (iconv_t) -1)
     return errno;
 
-  xkb_init_repeat (100L, 10L);
+  xkb_init_repeat (arguments.repeat_delay, arguments.repeat_interval);
 
   err = get_privileged_ports (0, &device_master);
   if (err)
