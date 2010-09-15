@@ -1,3 +1,5 @@
+#include <limits.h>
+#include <stdlib.h>
 #include <string.h>
 #define NEEDKTABLE
 #include "ks_tables.h"
