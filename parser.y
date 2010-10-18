@@ -1382,7 +1382,7 @@ key_set_keysym (struct key *key, group_t group, int level, symbol ks)
   else
     /* For NoSymbol leave the old symbol intact.  */
     if (!ks) {
-      debug_printf("symbol %d was not added to key.", ks);
+      debug_printf("symbol %d was not added to key.\n", ks);
       return;
     }
 
