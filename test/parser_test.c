@@ -1644,8 +1644,7 @@ int main (int argc, char **argv)
   setlocale(LC_ALL, "");
   
   arguments.pos = 1;
-  err = argp_parse (&argp, argc, argv,  ARGP_IN_ORDER | ARGP_NO_EXIT
-		    | ARGP_SILENT, 0, &arguments);
+  err = argp_parse (&argp, argc, argv,  ARGP_IN_ORDER, 0, &arguments);
 
   if (err && err != EINVAL)
     return err;
