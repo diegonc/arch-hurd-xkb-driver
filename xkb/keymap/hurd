@@ -192,7 +192,7 @@ xkb_keymap "mt" {
 };
 xkb_keymap "neo"	{
     xkb_keycodes	{ include "xfree86"		};
-    xkb_types		{ include "default+caps+level5+hurd"	};
+    xkb_types		{ include "default+hurd"	};
     xkb_compatibility	{ include "default+caps(caps_lock)+misc(assign_shift_left_action)+level5(level5_lock)"		};
     xkb_symbols		{ include "pc(pc105)+de(neo)+hurd"	};
     xkb_geometry 	{ include "pc(pc102)"		};
