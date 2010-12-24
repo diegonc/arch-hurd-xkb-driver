@@ -1,5 +1,8 @@
+prefix=
+datadir=$(prefix)/share
+libdir=$(prefix)/lib
 CFLAGS = -O -g -Wall -D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 -I. \
-	 -std=gnu99 -fgnu89-inline
+	 -std=gnu99 -fgnu89-inline -DXKB_DATA_DIR='"$(datadir)/X11/xkb"'
 OBJS =	kstoucs.o symname.o compose.o xkb.o parser.tab.o lex.o \
 	xkbdata.o xkbdefaults.o xkbtimer.o timer.o kbd-repeat.o \
 	kdioctlServer.o
@@ -8,8 +11,8 @@ LEX=flex
 YACC=bison
 
 # Where to put library and xkb files
-LIB	= $(DESTDIR)/lib/hurd/console/
-XKB	= $(DESTDIR)/share/X11/xkb
+LIB	= $(DESTDIR)/$(libdir)/hurd/console/
+XKB	= $(DESTDIR)/$(datadir)/X11/xkb
 
 all: xkb.so.0.3 input_driver_test
 
