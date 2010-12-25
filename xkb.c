@@ -1818,7 +1818,10 @@ xkb_start (void *handle)
 
   err = get_privileged_ports (0, &device_master);
   if (err)
-    return err;
+    {
+      iconv_close (cd);
+      return err;
+    }
   
   err = device_open (device_master, D_READ | D_WRITE, "@>=kbd", &kbd_dev);
   if (err == D_NO_SUCH_DEVICE)
@@ -1830,7 +1833,10 @@ xkb_start (void *handle)
 
   mach_port_deallocate (mach_task_self (), device_master);
   if (err)
+    {
+      iconv_close (cd);
       return err;
+    }
 
   if (gnumach_v1_compat)
     {
@@ -1840,6 +1846,7 @@ xkb_start (void *handle)
 	{
 	  device_close (kbd_dev);
 	  mach_port_deallocate (mach_task_self (), kbd_dev);
+	  iconv_close (cd);
 	  return err;
 	}
     }
