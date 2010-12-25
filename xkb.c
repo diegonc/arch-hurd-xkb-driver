@@ -1885,6 +1885,7 @@ xkb_fini (void *handle, int force)
     }
   device_close (kbd_dev);
   mach_port_deallocate (mach_task_self (), kbd_dev);
+  iconv_close (cd);
 
   console_unregister_consnode (cnode);
   console_destroy_consnode (cnode);
