@@ -1851,7 +1851,19 @@ xkb_start (void *handle)
 	}
     }
 
-  driver_add_input (&xkb_ops, NULL);
+  err = driver_add_input (&xkb_ops, NULL);
+  if (err)
+    {
+      if (gnumach_v1_compat)
+        {
+          int data = KB_ASCII;
+          device_set_status (kbd_dev, KDSKBDMODE, &data, 1);
+        }
+      device_close (kbd_dev);
+      mach_port_deallocate (mach_task_self (), kbd_dev);
+      iconv_close (cd);
+      return err;
+    }
 
   if (repeater_node)
     kbd_setrepeater (repeater_node, &cnode);
