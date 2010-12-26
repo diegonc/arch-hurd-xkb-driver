@@ -1218,8 +1218,8 @@ include_section (char *incl, int sectionsymbol, char *dirname,
   char *sectionname = NULL;
   FILE *includefile;
 
-  int current_location = scanner_get_current_location();
-  char* current_file = strdup(scanner_get_current_file());
+  int current_location = scanner_get_current_location ();
+  char* current_file = strdup (scanner_get_current_file ());
   
   sectionname = strchr (incl, '(');
   if (sectionname)
@@ -1238,7 +1238,7 @@ include_section (char *incl, int sectionsymbol, char *dirname,
 
       if (asprintf (&filename, "%s/%s", dirname, incl) < 0)
         {
-          free(current_file);
+          free (current_file);
           return ENOMEM;
         }
     }
@@ -1246,7 +1246,7 @@ include_section (char *incl, int sectionsymbol, char *dirname,
     {
       if (asprintf (&filename, "%s/%s", dirname, incl) < 0)
         {
-          free(current_file);
+          free (current_file);
           return ENOMEM;
         }
     }
@@ -1256,12 +1256,12 @@ include_section (char *incl, int sectionsymbol, char *dirname,
   if (includefile == NULL)
     {
       fprintf (stderr, "Couldn't open include file \"%s\"\n", filename);
-      free(current_file);
+      free (current_file);
       exit (EXIT_FAILURE);
     }
   
   include_file (includefile, new_mm, strdup (filename));
-  debug_printf("skipping to section %s\n", (sectionname ? sectionname : "default"));
+  debug_printf ("skipping to section %s\n", (sectionname ? sectionname : "default"));
   /* If there is a sectionname not the entire file should be included,
      the scanner should be positioned at the required section.  */
   int err;
@@ -1271,18 +1271,18 @@ include_section (char *incl, int sectionsymbol, char *dirname,
       err = skip_to_defaultsection ();
 
   if (err != 0) {
-     char* tmpbuf = malloc(sizeof(char)*1024);
+     char* tmpbuf = malloc (sizeof(char)*1024);
      if (tmpbuf) {
-         snprintf(tmpbuf, 1023, "cannot find section %s in file %s included from %s:%d.\n"
+         snprintf (tmpbuf, 1023, "cannot find section %s in file %s included from %s:%d.\n"
              , (sectionname ? sectionname : "DEFAULT")
              , filename, current_file, current_location);
-	 yyerror(tmpbuf);
-	 free(tmpbuf);
+	 yyerror (tmpbuf);
+	 free (tmpbuf);
      }
-     free(current_file);
-     exit(err);
+     free (current_file);
+     exit (err);
   }
-  free(current_file);
+  free (current_file);
   return 0;
 }
 
