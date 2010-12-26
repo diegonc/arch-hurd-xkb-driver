@@ -1228,18 +1228,27 @@ include_section (char *incl, int sectionsymbol, char *dirname,
 
       snlen = strlen (sectionname);
       if (sectionname[snlen-1] != ')')
-	return 0;
+        {
+          free(current_file);
+          return 0;
+        }
       sectionname[snlen-1] = '\0';
       sectionname[0] = '\0';
       sectionname++;
 
       if (asprintf (&filename, "%s/%s", dirname, incl) < 0)
-	return ENOMEM;
+        {
+          free(current_file);
+          return ENOMEM;
+        }
     }
   else
     {
       if (asprintf (&filename, "%s/%s", dirname, incl) < 0)
-	return ENOMEM;
+        {
+          free(current_file);
+          return ENOMEM;
+        }
     }
 
   includefile = fopen (strdup (filename), "r");
@@ -1247,6 +1256,7 @@ include_section (char *incl, int sectionsymbol, char *dirname,
   if (includefile == NULL)
     {
       fprintf (stderr, "Couldn't open include file \"%s\"\n", filename);
+      free(current_file);
       exit (EXIT_FAILURE);
     }
   
